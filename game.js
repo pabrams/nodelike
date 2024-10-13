@@ -6,6 +6,13 @@ import { Item, MeleeWeapon, Armor, Potion, Grenade } from './item.js';
 const viewportWidth = 10;
 const viewportHeight = 10;
 
+// Terrain visual representations and colors
+const terrainVisuals = {
+    grass: chalk.green('"'),
+    gravel: chalk.gray(':'),
+    wall: chalk.bgGray('#')
+};
+
 // Load color configuration
 let config;
 try {
@@ -90,14 +97,18 @@ function generateMap() {
             } else if (items.some(item => item.x === x && item.y === y)) {
                 row.push(itemColor('I')); // Item position
             } else {
-                row.push(emptySpaceColor('.')); // Empty space
+                const terrainType = mapConfig.terrain.find(t => t.x === x && t.y === y)?.type;
+                if (terrainType && terrainVisuals[terrainType]) {
+                    row.push(terrainVisuals[terrainType]); // Terrain representation
+                } else {
+                    row.push(emptySpaceColor('.')); // Empty space
+                }
             }
         }
         map.push(row);
     }
     return map;
 }
-
 
 // Display the generated map
 function displayMap(map) {
@@ -168,24 +179,39 @@ function setupInput() {
         }
     });
 }
+// Check if the terrain is passable at the specified coordinates
+function isPassable(x, y) {
+    const terrainType = mapConfig.terrain.find(t => t.x === x && t.y === y)?.type;
+    return terrainType !== 'wall';
+}
 
 // Movement logic for player
 function movePlayer(direction) {
+    let newX = player.x;
+    let newY = player.y;
+
     if (direction === 'w' && player.y > 0) {
-        player.y--;
+        newY--;
     } else if (direction === 'a' && player.x > 0) {
-        player.x--;
+        newX--;
     } else if (direction === 's' && player.y < mapHeight - 1) {
-        player.y++;
+        newY++;
     } else if (direction === 'd' && player.x < mapWidth - 1) {
-        player.x++;
+        newX++;
+    }
+
+    // Check if the new position is passable
+    if (isPassable(newX, newY)) {
+        player.x = newX;
+        player.y = newY;
+    } else {
+        console.log(chalk.red('You cannot move there. It is impassable!'));
     }
 
     // Refresh the map display after moving
     const map = generateMap();
     displayMap(map);
 }
-
 
 // Check if the player has reached the exit
 function checkWin() {

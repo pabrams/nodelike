@@ -9,9 +9,16 @@
         "x": 28,
         "y": 28
     },
+    "terrain": [
+        { "type": "grass", "x": 2, "y": 2 },
+        { "type": "gravel", "x": 5, "y": 5 },
+        { "type": "wall", "x": 10, "y": 10 },
+        { "type": "wall", "x": 11, "y": 10 },
+        { "type": "wall", "x": 12, "y": 10 }
+    ],
     "items": [
         { "key": "longsword", "x": 3, "y": 3 },
-        { "key": "chainmail", "x": 5, "y": 5 },
+        { "key": "chainmail", "x": 5, "y": 6 },
         { "key": "health_potion", "x": 10, "y": 7 },
         { "key": "grenade", "x": 15, "y": 20 }
     ]
