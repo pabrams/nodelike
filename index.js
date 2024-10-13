@@ -82,6 +82,14 @@ function movePlayer(direction) {
     }
 }
 
+// Check if the player is on an item and display a message
+function checkForItemUnderPlayer() {
+    const item = items.find(item => item.x === player.x && item.y === player.y);
+    if (item) {
+        console.log(chalk.yellow(`You see a ${item.name} here.`));
+    }
+}
+
 // Explicitly pick up an item when the player presses "P"
 function pickUpItem() {
     const itemIndex = items.findIndex(item => item.x === player.x && item.y === player.y);
@@ -131,6 +139,7 @@ function setupInput() {
             movePlayer(key.name);
             const map = generateMap();
             displayMap(map);
+            checkForItemUnderPlayer(); // Check for items after updating the map
 
             if (checkWin()) {
                 console.log(chalk.green('You found the exit! You win!'));
