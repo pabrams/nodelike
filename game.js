@@ -1,6 +1,7 @@
 import readline from 'readline';
 import chalk from 'chalk';
 import fs from 'fs';
+import { Item, MeleeWeapon, Armor, Potion, Grenade } from './item.js';
 
 // Load color configuration
 let config;
@@ -20,6 +21,15 @@ try {
     process.exit(1);
 }
 
+// Load item configurations
+let itemConfig;
+try {
+    itemConfig = JSON.parse(fs.readFileSync('items.json', 'utf8'));
+} catch (error) {
+    console.error('Error reading items configuration file:', error);
+    process.exit(1);
+}
+
 // Get colors from the configuration
 const playerColor = chalk[config.playerColor] || chalk.green;
 const itemColor = chalk[config.itemColor] || chalk.yellow;
@@ -31,7 +41,31 @@ const mapWidth = mapConfig.mapWidth;
 const mapHeight = mapConfig.mapHeight;
 const player = { x: mapConfig.playerStart.x, y: mapConfig.playerStart.y, inventory: [] };
 const exit = { x: mapConfig.exit.x, y: mapConfig.exit.y };
-const items = mapConfig.items.map(item => ({ ...item }));
+
+// Initialize items from map configuration with their locations
+let items = mapConfig.items.map(({ key, x, y }) => createItemInstance(key, x, y));
+
+// Function to create item instances based on configuration and location
+function createItemInstance(itemKey, x, y) {
+    const itemData = itemConfig[itemKey];
+    if (!itemData) {
+        console.error(`Item not found: ${itemKey}`);
+        return null;
+    }
+
+    switch (itemData.type) {
+        case 'melee_weapon':
+            return new MeleeWeapon(itemData, x, y);
+        case 'armor':
+            return new Armor(itemData, x, y);
+        case 'potion':
+            return new Potion(itemData, x, y);
+        case 'grenade':
+            return new Grenade(itemData, x, y);
+        default:
+            return new Item(itemData, x, y);
+    }
+}
 
 // Generate the game map
 function generateMap() {
@@ -44,7 +78,7 @@ function generateMap() {
             } else if (x === exit.x && y === exit.y) {
                 row.push(exitColor('X')); // Exit position
             } else if (items.some(item => item.x === x && item.y === y)) {
-                row.push(itemColor('i')); // Item position
+                row.push(itemColor('I')); // Item position
             } else {
                 row.push(emptySpaceColor('.')); // Empty space
             }
@@ -64,29 +98,11 @@ function displayMap(map) {
     console.log('Press P to pick up an item. Press I to view inventory. Press Q to quit.');
 }
 
-// Move the player based on input
-function movePlayer(direction) {
-    switch (direction.toLowerCase()) {
-        case 'w': // up
-            if (player.y > 0) player.y--;
-            break;
-        case 's': // down
-            if (player.y < mapHeight - 1) player.y++;
-            break;
-        case 'a': // left
-            if (player.x > 0) player.x--;
-            break;
-        case 'd': // right
-            if (player.x < mapWidth - 1) player.x++;
-            break;
-    }
-}
-
 // Check if the player is on an item and display a message
 function checkForItemUnderPlayer() {
     const item = items.find(item => item.x === player.x && item.y === player.y);
     if (item) {
-        console.log(chalk.yellow(`You see a ${item.name} here.`));
+        console.log(itemColor(`You see a ${item.name} here: ${item.description}`));
     }
 }
 
@@ -95,30 +111,23 @@ function pickUpItem() {
     const itemIndex = items.findIndex(item => item.x === player.x && item.y === player.y);
     if (itemIndex !== -1) {
         const item = items.splice(itemIndex, 1)[0];
-        player.inventory.push(item.name);
+        player.inventory.push(item);
         console.log(chalk.blue(`You picked up a ${item.name}!`));
+        
+        // Refresh the map to reflect the item removal
+        const map = generateMap();
+        displayMap(map);
     } else {
         console.log(chalk.yellow('There is no item to pick up here.'));
     }
 }
 
-// Check if the player has reached the exit
-function checkWin() {
-    return player.x === exit.x && player.y === exit.y;
-}
-
-// Display the player's inventory
-function displayInventory() {
-    console.clear();
-    console.log('Inventory:');
-    if (player.inventory.length === 0) {
-        console.log('Your inventory is empty.');
-    } else {
-        player.inventory.forEach((item, index) => {
-            console.log(`${index + 1}. ${item}`);
-        });
-    }
-    console.log('Press any key to return to the game.');
+// Game loop
+function gameLoop() {
+    console.log('Welcome to the Roguelike Game!');
+    const map = generateMap();
+    displayMap(map);
+    setupInput();
 }
 
 // Setup to read single keypress without pressing Enter
@@ -142,20 +151,41 @@ function setupInput() {
             checkForItemUnderPlayer(); // Check for items after updating the map
 
             if (checkWin()) {
-                console.log(chalk.green('You found the exit! You win!'));
+                console.log('You found the exit! You win!');
                 process.exit();
             }
         }
     });
 }
 
-// Game loop
-function gameLoop() {
-    console.log('Welcome to the Roguelike Game!');
-    const map = generateMap();
-    displayMap(map);
-    setupInput();
+// Movement logic for player
+function movePlayer(direction) {
+    if (direction === 'w' && player.y > 0) {
+        player.y--;
+    } else if (direction === 'a' && player.x > 0) {
+        player.x--;
+    } else if (direction === 's' && player.y < mapHeight - 1) {
+        player.y++;
+    } else if (direction === 'd' && player.x < mapWidth - 1) {
+        player.x++;
+    }
 }
 
-// Start the game
+// Check if the player has reached the exit
+function checkWin() {
+    return player.x === exit.x && player.y === exit.y;
+}
+
+// Display player's inventory
+function displayInventory() {
+    console.log(chalk.magenta('Inventory:'));
+    if (player.inventory.length === 0) {
+        console.log('Your inventory is empty.');
+    } else {
+        player.inventory.forEach((item, index) => {
+            console.log(`${index + 1}. ${item.getInfo()}`);
+        });
+    }
+}
+
 gameLoop();

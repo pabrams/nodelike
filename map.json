@@ -1,11 +1,18 @@
 {
     "mapWidth": 10,
     "mapHeight": 10,
-    "playerStart": { "x": 0, "y": 0 },
-    "exit": { "x": 9, "y": 9 },
+    "playerStart": {
+        "x": 1,
+        "y": 1
+    },
+    "exit": {
+        "x": 8,
+        "y": 8
+    },
     "items": [
-        { "x": 3, "y": 3, "name": "Sword" },
-        { "x": 5, "y": 6, "name": "Shield" },
-        { "x": 8, "y": 2, "name": "Health Potion" }
+        { "key": "longsword", "x": 3, "y": 3 },
+        { "key": "chainmail", "x": 5, "y": 5 },
+        { "key": "health_potion", "x": 2, "y": 7 },
+        { "key": "grenade", "x": 7, "y": 2 }
     ]
 }

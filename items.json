@@ -1,0 +1,38 @@
+{
+    "longsword": {
+        "name": "Longsword",
+        "type": "melee_weapon",
+        "description": "A versatile weapon with a long blade, suitable for slashing or thrusting.",
+        "weight": 3,
+        "average_market_price": 150,
+        "rarity": "uncommon",
+        "damage_range": "1d8",
+        "damage_type": "slashing"
+    },
+    "chainmail": {
+        "name": "Chainmail",
+        "type": "armor",
+        "description": "Armor made of interlocking metal rings, offering protection against physical attacks.",
+        "weight": 40,
+        "average_market_price": 300,
+        "rarity": "rare",
+        "armor_class": 16
+    },
+    "health_potion": {
+        "name": "Health Potion",
+        "type": "potion",
+        "description": "A magical liquid that heals wounds and restores health.",
+        "weight": 0.5,
+        "average_market_price": 50,
+        "rarity": "common"
+    },
+    "grenade": {
+        "name": "Grenade",
+        "type": "grenade",
+        "description": "A small explosive device designed to be thrown at enemies.",
+        "weight": 1,
+        "average_market_price": 200,
+        "rarity": "uncommon",
+        "explosive_power": "2d6"
+    }
+}
