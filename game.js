@@ -3,8 +3,8 @@ import chalk from 'chalk';
 import fs from 'fs';
 import { Item, MeleeWeapon, Armor, Potion, Grenade } from './item.js';
 
-const viewportWidth = 10;
-const viewportHeight = 10;
+const viewportWidth = 20;
+const viewportHeight = 16;
 
 // Terrain visual representations and colors
 const terrainVisuals = {
