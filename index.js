@@ -11,22 +11,27 @@ try {
     process.exit(1);
 }
 
+// Load map configuration
+let mapConfig;
+try {
+    mapConfig = JSON.parse(fs.readFileSync('map.json', 'utf8'));
+} catch (error) {
+    console.error('Error reading map file:', error);
+    process.exit(1);
+}
+
 // Get colors from the configuration
 const playerColor = chalk[config.playerColor] || chalk.green;
 const itemColor = chalk[config.itemColor] || chalk.yellow;
 const exitColor = chalk[config.exitColor] || chalk.red;
 const emptySpaceColor = chalk[config.emptySpaceColor] || chalk.white;
 
-// Define the game map
-const mapWidth = 10;
-const mapHeight = 10;
-const player = { x: 0, y: 0, inventory: [] };
-const exit = { x: mapWidth - 1, y: mapHeight - 1 };
-const items = [
-    { x: 3, y: 3, name: 'Sword' },
-    { x: 5, y: 6, name: 'Shield' },
-    { x: 8, y: 2, name: 'Health Potion' }
-];
+// Define the game map using map configuration
+const mapWidth = mapConfig.mapWidth;
+const mapHeight = mapConfig.mapHeight;
+const player = { x: mapConfig.playerStart.x, y: mapConfig.playerStart.y, inventory: [] };
+const exit = { x: mapConfig.exit.x, y: mapConfig.exit.y };
+const items = mapConfig.items.map(item => ({ ...item }));
 
 // Generate the game map
 function generateMap() {
@@ -56,7 +61,7 @@ function displayMap(map) {
         console.log(row.join(' '));
     });
     console.log('Use W (up), A (left), S (down), D (right) to move.');
-    console.log('Press I to view inventory. Press Q to quit.');
+    console.log('Press P to pick up an item. Press I to view inventory. Press Q to quit.');
 }
 
 // Move the player based on input
@@ -75,16 +80,17 @@ function movePlayer(direction) {
             if (player.x < mapWidth - 1) player.x++;
             break;
     }
-    checkForItemPickup();
 }
 
-// Check if the player is on an item and pick it up
-function checkForItemPickup() {
+// Explicitly pick up an item when the player presses "P"
+function pickUpItem() {
     const itemIndex = items.findIndex(item => item.x === player.x && item.y === player.y);
     if (itemIndex !== -1) {
         const item = items.splice(itemIndex, 1)[0];
         player.inventory.push(item.name);
         console.log(chalk.blue(`You picked up a ${item.name}!`));
+    } else {
+        console.log(chalk.yellow('There is no item to pick up here.'));
     }
 }
 
@@ -119,6 +125,8 @@ function setupInput() {
             process.exit();
         } else if (key.name === 'i') {
             displayInventory();
+        } else if (key.name === 'p') {
+            pickUpItem();
         } else {
             movePlayer(key.name);
             const map = generateMap();
