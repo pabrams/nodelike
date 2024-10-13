@@ -1,6 +1,6 @@
 {
-    "playerColor": "green",
-    "itemColor": "yellow",
-    "exitColor": "red",
-    "emptySpaceColor": "white"
+    "playerColor": "blueBright",
+    "itemColor": "white",
+    "exitColor": "redBright",
+    "emptySpaceColor": "gray"
 }
