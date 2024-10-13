@@ -44,7 +44,7 @@ function generateMap() {
             } else if (x === exit.x && y === exit.y) {
                 row.push(exitColor('X')); // Exit position
             } else if (items.some(item => item.x === x && item.y === y)) {
-                row.push(itemColor('I')); // Item position
+                row.push(itemColor('i')); // Item position
             } else {
                 row.push(emptySpaceColor('.')); // Empty space
             }
