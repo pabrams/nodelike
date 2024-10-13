@@ -3,6 +3,9 @@ import chalk from 'chalk';
 import fs from 'fs';
 import { Item, MeleeWeapon, Armor, Potion, Grenade } from './item.js';
 
+const viewportWidth = 10;
+const viewportHeight = 10;
+
 // Load color configuration
 let config;
 try {
@@ -67,12 +70,19 @@ function createItemInstance(itemKey, x, y) {
     }
 }
 
-// Generate the game map
+// Generate the game map based on the viewport
 function generateMap() {
     const map = [];
-    for (let y = 0; y < mapHeight; y++) {
+
+    // Calculate the top-left corner of the viewport
+    const startX = Math.max(0, player.x - Math.floor(viewportWidth / 2));
+    const startY = Math.max(0, player.y - Math.floor(viewportHeight / 2));
+    const endX = Math.min(mapWidth, startX + viewportWidth);
+    const endY = Math.min(mapHeight, startY + viewportHeight);
+
+    for (let y = startY; y < endY; y++) {
         const row = [];
-        for (let x = 0; x < mapWidth; x++) {
+        for (let x = startX; x < endX; x++) {
             if (x === player.x && y === player.y) {
                 row.push(playerColor('@')); // Player position
             } else if (x === exit.x && y === exit.y) {
@@ -88,14 +98,15 @@ function generateMap() {
     return map;
 }
 
-// Display the game map
+
+// Display the generated map
 function displayMap(map) {
     console.clear();
     map.forEach(row => {
-        console.log(row.join(' '));
+        console.log(row.join(''));
     });
-    console.log('Use W (up), A (left), S (down), D (right) to move.');
-    console.log('Press P to pick up an item. Press I to view inventory. Press Q to quit.');
+    console.log(chalk.green('Use WASD to move. Press P to pick up items.'));
+    displayInventory();
 }
 
 // Check if the player is on an item and display a message
@@ -169,7 +180,12 @@ function movePlayer(direction) {
     } else if (direction === 'd' && player.x < mapWidth - 1) {
         player.x++;
     }
+
+    // Refresh the map display after moving
+    const map = generateMap();
+    displayMap(map);
 }
+
 
 // Check if the player has reached the exit
 function checkWin() {
