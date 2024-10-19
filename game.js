@@ -2,6 +2,7 @@ import readline from 'readline';
 import chalk from 'chalk';
 import fs from 'fs';
 import { Item, MeleeWeapon, Armor, Potion, Grenade } from './item.js';
+import { getRandomValues } from 'crypto';
 
 const viewportWidth = 20;
 const viewportHeight = 12;
@@ -12,6 +13,12 @@ const terrainVisuals = {
     ":": chalk.gray(':'),
     "#": chalk.bgGray('#')
 };
+const terrainDescriptions = {
+    ".": "grass",
+    ":": "gravel", 
+    "#": "wall",
+    " ": "dirt"
+}
 
 // Load color configuration
 let config;
@@ -129,6 +136,10 @@ function displayMap(map) {
     displayInventory();
 }
 
+function showTerrainUnderPlayer() {
+    console.log ("You are standing on " + terrainDescriptions[mapConfig.terrain[player.y][player.x]]);
+}
+
 // Check if the player is on an item and display a message
 function checkForItemUnderPlayer() {
     const item = fullItems.find(item => item.x === player.x && item.y === player.y);
@@ -179,6 +190,7 @@ function setupInput() {
             movePlayer(key.name);
             const map = drawMap();
             displayMap(map);
+            showTerrainUnderPlayer();
             checkForItemUnderPlayer(); // Check for items after updating the map
         }
     });
