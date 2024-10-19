@@ -14,10 +14,10 @@ const terrainVisuals = {
     "#": chalk.bgGray('#')
 };
 const terrainDescriptions = {
-    ".": "grass",
-    ":": "gravel", 
-    "#": "wall",
-    " ": "dirt"
+    ".": chalk.green("grass"),
+    ":": chalk.grey("gravel"), 
+    "#": chalk.gray("wall"),
+    " ": chalk.yellow("dirt")
 }
 
 // Load color configuration
@@ -131,11 +131,15 @@ function displayMap(map) {
         console.log(row.join(''));
     });
     console.log(chalk.green('Use h for help.'));
-    displayInventory();
+    showTerrainUnderPlayer();
 }
 
 function showTerrainUnderPlayer() {
-    console.log ("You are standing on " + terrainDescriptions[mapConfig.terrain[player.y][player.x]]);
+    console.log (
+        chalk.blue('You are standing on ') + 
+        chalk.yellowBright(
+            terrainDescriptions[mapConfig.terrain[player.y][player.x]])
+        )
 }
 
 // Check if the player is on an item and display a message
@@ -191,7 +195,6 @@ function setupInput() {
             const map = drawMap(); // Draw the map after moving
             displayMap(map); // Display the updated map
             setImmediate(() => { // Use setImmediate to ensure output
-                showTerrainUnderPlayer(); // Show terrain under the player
                 checkForItemUnderPlayer(); // Check for items under the player
             });
         }
@@ -217,7 +220,6 @@ function displayHelp() {
         chalk.yellowBright(' : ') + 
         chalk.green('View intentory.')
     );
-    
     console.log(
         chalk.white('H   ') + 
         chalk.yellowBright(' : ') + 
