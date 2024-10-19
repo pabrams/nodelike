@@ -1,5 +1,5 @@
 import readline from 'readline';
-import chalk from 'chalk';
+import chalk, { chalkStderr } from 'chalk';
 import fs from 'fs';
 import { Item, MeleeWeapon, Armor, Potion, Grenade } from './item.js';
 import { getRandomValues } from 'crypto';
@@ -23,7 +23,6 @@ const terrainDescriptions = {
 // Load color configuration
 let config;
 try {
-    console.log("wtf is going on");
     config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 } catch (error) {
     console.error('Error reading config file:', error);
@@ -54,7 +53,6 @@ const player = {
     y: playerStart.y,
     inventory: []
 };
-
 
 // Load item configurations
 let itemConfig;
@@ -132,7 +130,7 @@ function displayMap(map) {
     map.forEach(row => {
         console.log(row.join(''));
     });
-    console.log(chalk.green('Use WASD to move. Press P to pick up items.'));
+    console.log(chalk.green('Use h for help.'));
     displayInventory();
 }
 
@@ -179,6 +177,8 @@ function setupInput() {
     process.stdin.on('keypress', (str, key) => {
         if (key.ctrl && key.name === 'c') {
             process.exit(); // Allow Ctrl+C to exit
+        } else if (key.name === 'h') {
+            displayHelp(); // Show help screen
         } else if (key.name === 'q') {
             console.log('You quit the game.');
             process.exit();
@@ -187,12 +187,55 @@ function setupInput() {
         } else if (key.name === 'p') {
             pickUpItem();
         } else {
-            movePlayer(key.name);
-            const map = drawMap();
-            displayMap(map);
-            showTerrainUnderPlayer();
-            checkForItemUnderPlayer(); // Check for items after updating the map
+            movePlayer(key.name); // Move the player
+            const map = drawMap(); // Draw the map after moving
+            displayMap(map); // Display the updated map
+            setImmediate(() => { // Use setImmediate to ensure output
+                showTerrainUnderPlayer(); // Show terrain under the player
+                checkForItemUnderPlayer(); // Check for items under the player
+            });
         }
+    });
+}
+
+function displayHelp() {
+    console.clear();
+    console.log(chalk.green('Help Screen'));
+    console.log(chalk.yellow('Use the following keys to control the game:'));
+    console.log(
+        chalk.white('WASD') + 
+        chalk.yellowBright(' : ') + 
+        chalk.green('Move up, left, down, right.')
+    );
+    console.log(
+        chalk.white('P   ') + 
+        chalk.yellowBright(' : ') + 
+        chalk.green('Pick up items.')
+    );
+    console.log(
+        chalk.white('I   ') + 
+        chalk.yellowBright(' : ') + 
+        chalk.green('View intentory.')
+    );
+    
+    console.log(
+        chalk.white('H   ') + 
+        chalk.yellowBright(' : ') + 
+        chalk.green('Show this help screen.')
+    );
+    console.log(
+        chalk.white('Q   ') + 
+        chalk.yellowBright(' : ') + 
+        chalk.green('Quit the game.')
+    );
+    console.log(chalk.green('Press any key to return to the game.'));
+    
+    readline.emitKeypressEvents(process.stdin);
+    process.stdin.setRawMode(true);
+    process.stdin.once('keypress', () => {
+        setupInput(); // Return to input mode
+        const map = drawMap();
+        displayMap(map);
     });
 }
 
