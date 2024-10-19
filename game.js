@@ -164,7 +164,7 @@ function gameLoop() {
 // Setup to read single keypress without pressing Enter
 function setupInput() {
     readline.emitKeypressEvents(process.stdin);
-    process.stdin.setRawMode(true);  
+    process.stdin.setRawMode(true); 
     process.stdin.on('keypress', (str, key) => {
         if (key.ctrl && key.name === 'c') {
             process.exit(); // Allow Ctrl+C to exit
@@ -177,7 +177,7 @@ function setupInput() {
             pickUpItem();
         } else {
             movePlayer(key.name);
-            const map =  drawMap();
+            const map = drawMap();
             displayMap(map);
             checkForItemUnderPlayer(); // Check for items after updating the map
         }
