@@ -7,13 +7,9 @@ class Item {
         this.weight = weight;
         this.averageMarketPrice = average_market_price;
         this.rarity = rarity;
-        this.instanceNumber = Item.generateInstanceNumber();
-        this.x = x; // Item's x-coordinate on the map
-        this.y = y; // Item's y-coordinate on the map
-    }
-
-    static generateInstanceNumber() {
-        return Math.floor(Math.random() * 10000);
+        this.x = x;
+        this.y = y;
+        this.id = `${name}_${x}_${y}`
     }
 
     getInfo() {
