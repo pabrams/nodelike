@@ -1,5 +1,4 @@
 import readline from 'readline';
-import chalk, { chalkStderr } from 'chalk';
 import fs from 'fs';
 import { Item, MeleeWeapon, Armor, Potion, Grenade } from './item.js';
 import { getRandomValues } from 'crypto';
@@ -7,19 +6,22 @@ import { getRandomValues } from 'crypto';
 const viewportWidth = 20;
 const viewportHeight = 12;
 
-// Terrain visual representations and colors
-const terrainVisuals = {
-    ".": chalk.green('.'),
-    ":": chalk.gray(':'),
-    "#": chalk.bgGray('#')
-};
-const terrainDescriptions = {
-    ".": chalk.green("grass"),
-    ":": chalk.grey("gravel"), 
-    "#": chalk.gray("wall"),
-    " ": chalk.yellow("dirt")
-}
+import terrainConfig from './config/terrainTypes.json' assert {type: 'json'};
+import chalk from 'chalk';
 
+const terrainTypes = Object.fromEntries(
+    Object.entries(terrainConfig).map(([key, value]) => [
+        key,
+        {
+            visual: chalk[value.colour](key),
+            description: chalk[value.colour](value.description)
+        }
+    ])
+);
+console.log("terrain types: ");
+console.log(terrainTypes);
+console.log(" at .")
+console.log(terrainTypes["."]);
 // Load general configuration
 let config;
 try {
@@ -34,10 +36,10 @@ function parseMapFile(filename) {
     const mapj = JSON.parse(fs.readFileSync(filename, 'utf8'));
 
     const mapData = {
-        mapWidth: mapj.terrainLines[0].length,
-        mapHeight: mapj.terrainLines.length,
+        mapWidth: mapj.terrainRows[0].length,
+        mapHeight: mapj.terrainRows.length,
         playerStart: {"x": 1, "y": 1},
-        terrain: mapj.terrainLines,
+        terrain: mapj.terrainRows,
         items: mapj.items
     };
     return mapData;
@@ -112,10 +114,8 @@ function drawMap() {
                 row.push(itemColor('I')); // Item position
             } else {
                 const terrainType = terrain[y][x];
-                if (terrainType && terrainVisuals[terrainType]) {
-                    row.push(terrainVisuals[terrainType]); // Terrain representation
-                } else {
-                    row.push(emptySpaceColor(' ')); // Empty space, or dirt
+                if (terrainType && terrainTypes[terrainType].visual) {
+                    row.push(terrainTypes[terrainType].visual); // Terrain representation
                 }
             }
         }
@@ -137,9 +137,8 @@ function displayMap(map) {
 function showTerrainUnderPlayer() {
     console.log (
         chalk.blue('You are standing on ') + 
-        chalk.yellowBright(
-            terrainDescriptions[mapConfig.terrain[player.y][player.x]])
-        )
+        chalk.yellowBright(terrainTypes[mapConfig.terrain[player.y][player.x]].description)
+    )
 }
 
 // Check if the player is on an item and display a message

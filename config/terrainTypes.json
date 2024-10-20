@@ -1,0 +1,18 @@
+{
+    ".": {
+        "colour": "green",
+        "description": "grass"
+    },
+    ":": {
+        "colour": "gray",
+        "description": "gravel"
+    },
+    "#": {
+        "colour": "bgGray",
+        "description": "wall"
+    },
+    " ": {
+        "colour": "yellow",
+        "description": "dirt"
+    }
+}
