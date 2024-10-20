@@ -1,16 +1,11 @@
 import readline from 'readline';
 import { Item, MeleeWeapon, Armor, Potion, Grenade, ItemAttributes, MeleeWeaponAttributes, ArmorAttributes, GrenadeAttributes } from './item.js';
-
+import chalk from 'chalk';
 
 import config from './config/general.json' assert {type: 'json'};
 import mapj from './config/map.json' assert {type: 'json'};
 import itemConfigJson from './config/items.json' assert { type: 'json' };
-
-
 import terrainConfig from './config/terrainTypes.json' assert {type: 'json'};
-
-import chalk from 'chalk';
-
 
 // Define a type for terrain visual configurations
 interface TerrainType {
@@ -18,7 +13,6 @@ interface TerrainType {
     description: string;
     isPassable: boolean;
 }
-
 
 // Utility function to safely get a Chalk color function
 function getChalkColorFunction(color: string): (text: string) => string {
@@ -40,7 +34,6 @@ const terrainTypes: Record<string, TerrainType> = Object.fromEntries(
         }
     ])
 );
-
 
 const viewportWidth = 20;
 const viewportHeight = 12;

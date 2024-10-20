@@ -1,7 +1,7 @@
 // item.ts
 interface ItemAttributes {
     name: string;
-    type: 'melee_weapon' | 'armor' | 'potion' | 'grenade' | 'default'; // This must match your data
+    type: 'melee_weapon' | 'armor' | 'potion' | 'grenade' | 'default'; 
     description: string;
     weight: number;
     average_market_price: number;
