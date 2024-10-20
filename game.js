@@ -18,10 +18,7 @@ const terrainTypes = Object.fromEntries(
         }
     ])
 );
-console.log("terrain types: ");
-console.log(terrainTypes);
-console.log(" at .")
-console.log(terrainTypes["."]);
+
 // Load general configuration
 let config;
 try {
