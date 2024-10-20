@@ -20,10 +20,10 @@ const terrainDescriptions = {
     " ": chalk.yellow("dirt")
 }
 
-// Load color configuration
+// Load general configuration
 let config;
 try {
-    config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+    config = JSON.parse(fs.readFileSync('config/general.json', 'utf8'));
 } catch (error) {
     console.error('Error reading config file:', error);
     process.exit(1);
@@ -44,7 +44,7 @@ function parseMapFile(filename) {
 }
 
 // Load the map configuration from the file
-const mapConfig = parseMapFile('map.json');
+const mapConfig = parseMapFile('config/map.json');
 const { mapWidth, mapHeight, playerStart, terrain, items } = mapConfig;
 
 // Initialize game state based on the parsed configuration
@@ -57,7 +57,7 @@ const player = {
 // Load item configurations
 let itemConfig;
 try {
-    itemConfig = JSON.parse(fs.readFileSync('items.json', 'utf8'));
+    itemConfig = JSON.parse(fs.readFileSync('config/items.json', 'utf8'));
 } catch (error) {
     console.error('Error reading items configuration file:', error);
     process.exit(1);
