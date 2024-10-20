@@ -1,26 +1,49 @@
 import readline from 'readline';
-import { Item, MeleeWeapon, Armor, Potion, Grenade } from './item.js';
-import chalk from 'chalk';
+import { Item, MeleeWeapon, Armor, Potion, Grenade, ItemAttributes, MeleeWeaponAttributes, ArmorAttributes, GrenadeAttributes } from './item.js';
 
-import terrainConfig from './config/terrainTypes.json' assert {type: 'json'};
+
 import config from './config/general.json' assert {type: 'json'};
 import mapj from './config/map.json' assert {type: 'json'};
-import itemConfig from './config/items.json' assert {type: 'json'};
-
-const viewportWidth = 20;
-const viewportHeight = 12;
+import itemConfigJson from './config/items.json' assert { type: 'json' };
 
 
-const terrainTypes = Object.fromEntries(
+import terrainConfig from './config/terrainTypes.json' assert {type: 'json'};
+
+import chalk from 'chalk';
+
+
+// Define a type for terrain visual configurations
+interface TerrainType {
+    visual: string;
+    description: string;
+    isPassable: boolean;
+}
+
+
+// Utility function to safely get a Chalk color function
+function getChalkColorFunction(color: string): (text: string) => string {
+    const chalkFunction = (chalk as any)[color];
+    if (typeof chalkFunction === 'function') {
+        return chalkFunction;
+    }
+    return chalk.white; // Fallback to white if the color function is not found
+}
+
+// Transform the terrain configuration to include dynamic chalk colors
+const terrainTypes: Record<string, TerrainType> = Object.fromEntries(
     Object.entries(terrainConfig).map(([key, value]) => [
         key,
         {
-            visual: chalk[value.colour](key),
-            description: chalk[value.colour](value.description)
+            visual: getChalkColorFunction(value.colour)(key),
+            description: getChalkColorFunction(value.colour)(value.description),
+            isPassable: value.isPassable,
         }
     ])
 );
- 
+
+
+const viewportWidth = 20;
+const viewportHeight = 12;
 
 const mapConfig = {
     mapWidth: mapj.terrainRows[0].length,
@@ -33,41 +56,61 @@ const mapConfig = {
 
 const { mapWidth, mapHeight, playerStart, terrain } = mapConfig;
 
+interface Player {
+    x: number;
+    y: number;
+    inventory: Item[]; // Ensure inventory is defined as an array of Item
+}
+
 // Initialize game state based on the parsed configuration
-const player = {
+const player: Player= {
     x: playerStart.x,
     y: playerStart.y,
     inventory: []
 };
 
 // Get colors from the configuration
-const playerColor = chalk[config.playerColor] || chalk.green;
-const itemColor = chalk[config.itemColor] || chalk.yellow;
+const playerColor = getChalkColorFunction(config.playerColor);
+const itemColor = getChalkColorFunction(config.itemColor);
 
-// Initialize items from map configuration with their locations
-let items = mapConfig.items.map(({ key, x, y }) => createItemInstance(key, x, y));
 
-// Function to create item instances based on configuration and location
-function createItemInstance(itemKey, x, y) {
+// Define a type for the complete item config
+type ItemConfig = {
+    [key: string]: ItemAttributes | MeleeWeaponAttributes | ArmorAttributes | GrenadeAttributes;
+};
+
+// Cast the imported JSON to the defined type
+const itemConfig: ItemConfig = itemConfigJson as ItemConfig;
+
+function createItemInstance(itemKey: string, x: number, y: number): Item | null {
     const itemDetail = itemConfig[itemKey];
     if (!itemDetail) {
         console.error(`Item not found: ${itemKey}`);
         return null;
     }
 
+    const commonAttributes = { ...itemDetail, x, y };
+
+    // Handle different item types
     switch (itemDetail.type) {
         case 'melee_weapon':
-            return new MeleeWeapon(itemDetail, x, y);
+            return new MeleeWeapon(commonAttributes as MeleeWeaponAttributes);
         case 'armor':
-            return new Armor(itemDetail, x, y);
+            return new Armor(commonAttributes as ArmorAttributes);
         case 'potion':
-            return new Potion(itemDetail, x, y);
+            return new Potion(commonAttributes as ItemAttributes);
         case 'grenade':
-            return new Grenade(itemDetail, x, y);
+            return new Grenade(commonAttributes as GrenadeAttributes);
         default:
-            return new Item(itemDetail, x, y);
+            return new Item(commonAttributes as ItemAttributes);
     }
 }
+
+// Initialize items from map configuration with their locations
+let items: Item[] = mapConfig.items
+    .map(({ key, x, y }) => createItemInstance(key, x, y))
+    .filter((item): item is Item => item !== null); // This ensures only Item instances remain
+
 
 // Generate the game map based on the viewport
 function drawMap() {
@@ -84,7 +127,7 @@ function drawMap() {
         for (let x = startX; x < endX; x++) {
             if (x === player.x && y === player.y) {
                 row.push(playerColor('@')); // Player position
-            } else if (items.some(item => item.x === x && item.y === y)) {
+            } else if (items.some(item => item.attributes?.x === x && item.attributes?.y === y)) {
                 row.push(itemColor('I')); // Item position
             } else {
                 const terrainType = terrain[y][x];
@@ -99,9 +142,9 @@ function drawMap() {
 }
 
 // Display the generated map
-function displayMap(map) {
+function displayMap(map: any[]) {
     console.clear();
-    map.forEach(row => {
+    map.forEach((row: any[]) => {
         console.log(row.join(''));
     });
     console.log(chalk.green('Use h for help.'));
@@ -117,20 +160,20 @@ function showTerrainUnderPlayer() {
 
 // Check if the player is on an item and display a message
 function checkForItemUnderPlayer() {
-    const item = items.find(item => item.x === player.x && item.y === player.y);
+    const item = items.find(item => item?.attributes.x === player.x && item.attributes.y === player.y);
     if (item) {
-        console.log(itemColor(`You see a ${item.name} here: ${item.description}`));
+        console.log(itemColor(`You see a ${item.attributes.name} here: ${item.attributes.description}`));
     }
 }
 
 // Explicitly pick up an item when the player presses "P"
 function pickUpItem() {
-    const itemIndex = items.findIndex(item => item.x === player.x && item.y === player.y);
+    const itemIndex = items.findIndex(item => item.attributes.x === player.x && item.attributes.y === player.y);
     if (itemIndex !== -1) {
-        const item = items.splice(itemIndex, 1)[0];
+        const item = items.splice(itemIndex, 1)[0] as Item; // Assert item as Item
         player.inventory.push(item);
-        console.log(chalk.blue(`You picked up a ${item.name}!`));
-        
+        console.log(chalk.blue(`You picked up a ${item.attributes.name}!`)); // Access name via attributes
+
         // Refresh the map to reflect the item removal
         const map = drawMap();
         displayMap(map);
@@ -215,13 +258,13 @@ function displayHelp() {
 }
 
 // Check if the terrain is passable at the specified coordinates
-function isPassable(x, y) {
+function isPassable(x: number, y: number) {
     const terrainType = mapConfig.terrain[y][x];
-    return terrainType !== '#';
+    return terrainTypes[terrainType].isPassable;
 }
 
 // Movement logic for player
-function movePlayer(direction) {
+function movePlayer(direction: string) {
     let newX = player.x;
     let newY = player.y;
 

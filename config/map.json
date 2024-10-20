@@ -17,12 +17,9 @@
         "##############################"
     ],
     "items": [        
-        { "key": "longsword", "x": 3, "y": 3 },
-        { "key": "chainmail", "x": 5, "y": 6 },
-        { "key": "health_potion", "x": 10, "y": 7 },
+        { "key": "sword", "x": 3, "y": 3 },
+        { "key": "shield", "x": 5, "y": 6 },
+        { "key": "healing_potion", "x": 10, "y": 7 },
         { "key": "grenade", "x": 15, "y": 20 }
-    ],
-    "terrain": [
-        { "grass" : "."}
     ]
 }

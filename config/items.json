@@ -1,38 +1,59 @@
 {
-    "longsword": {
-        "name": "Longsword",
+    "sword": {
+        "name": "Sword",
         "type": "melee_weapon",
-        "description": "A versatile weapon with a long blade, suitable for slashing or thrusting.",
-        "weight": 3,
+        "description": "A sharp blade.",
+        "weight": 5,
+        "average_market_price": 100,
+        "rarity": "common",
+        "damage_range": "5-10",
+        "damage_type": "slashing",
+        "x": 0,
+        "y": 0
+    },
+    "shield": {
+        "name": "Shield",
+        "type": "armor",
+        "description": "A sturdy shield.",
+        "weight": 8,
         "average_market_price": 150,
         "rarity": "uncommon",
-        "damage_range": "1d8",
-        "damage_type": "slashing"
+        "armor_class": 5,
+        "x": 0,
+        "y": 0
     },
-    "chainmail": {
-        "name": "Chainmail",
-        "type": "armor",
-        "description": "Armor made of interlocking metal rings, offering protection against physical attacks.",
-        "weight": 40,
-        "average_market_price": 300,
-        "rarity": "rare",
-        "armor_class": 16
-    },
-    "health_potion": {
-        "name": "Health Potion",
+    "healing_potion": {
+        "name": "Healing Potion",
         "type": "potion",
-        "description": "A magical liquid that heals wounds and restores health.",
+        "description": "Restores health.",
         "weight": 0.5,
-        "average_market_price": 50,
-        "rarity": "common"
+        "average_market_price": 20,
+        "rarity": "common",
+        "x": 0,
+        "y": 0,
+        "healing_amount": 20
     },
     "grenade": {
         "name": "Grenade",
         "type": "grenade",
-        "description": "A small explosive device designed to be thrown at enemies.",
+        "description": "Explosive device.",
         "weight": 1,
-        "average_market_price": 200,
-        "rarity": "uncommon",
-        "explosive_power": "2d6"
+        "average_market_price": 50,
+        "rarity": "rare",
+        "explosive_power": 10,
+        "x": 0,
+        "y": 0
+    },
+    "dagger": {
+        "name": "Dagger",
+        "type": "melee_weapon",
+        "description": "A small, sharp blade.",
+        "weight": 1,
+        "average_market_price": 25,
+        "rarity": "common",
+        "damage_range": "2-5",
+        "damage_type": "piercing",
+        "x": 0,
+        "y": 0
     }
 }
