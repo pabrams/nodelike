@@ -1,13 +1,15 @@
 import readline from 'readline';
-import fs from 'fs';
 import { Item, MeleeWeapon, Armor, Potion, Grenade } from './item.js';
-import { getRandomValues } from 'crypto';
+import chalk from 'chalk';
+
+import terrainConfig from './config/terrainTypes.json' assert {type: 'json'};
+import config from './config/general.json' assert {type: 'json'};
+import mapj from './config/map.json' assert {type: 'json'};
+import itemConfig from './config/items.json' assert {type: 'json'};
 
 const viewportWidth = 20;
 const viewportHeight = 12;
 
-import terrainConfig from './config/terrainTypes.json' assert {type: 'json'};
-import chalk from 'chalk';
 
 const terrainTypes = Object.fromEntries(
     Object.entries(terrainConfig).map(([key, value]) => [
@@ -18,33 +20,18 @@ const terrainTypes = Object.fromEntries(
         }
     ])
 );
+ 
 
-// Load general configuration
-let config;
-try {
-    config = JSON.parse(fs.readFileSync('config/general.json', 'utf8'));
-} catch (error) {
-    console.error('Error reading config file:', error);
-    process.exit(1);
-}
+const mapConfig = {
+    mapWidth: mapj.terrainRows[0].length,
+    mapHeight: mapj.terrainRows.length,
+    playerStart: {"x": 1, "y": 1},
+    terrain: mapj.terrainRows,
+    items: mapj.items
+};
 
-// Function to parse the map from a text file
-function parseMapFile(filename) {
-    const mapj = JSON.parse(fs.readFileSync(filename, 'utf8'));
 
-    const mapData = {
-        mapWidth: mapj.terrainRows[0].length,
-        mapHeight: mapj.terrainRows.length,
-        playerStart: {"x": 1, "y": 1},
-        terrain: mapj.terrainRows,
-        items: mapj.items
-    };
-    return mapData;
-}
-
-// Load the map configuration from the file
-const mapConfig = parseMapFile('config/map.json');
-const { mapWidth, mapHeight, playerStart, terrain, items } = mapConfig;
+const { mapWidth, mapHeight, playerStart, terrain } = mapConfig;
 
 // Initialize game state based on the parsed configuration
 const player = {
@@ -53,22 +40,12 @@ const player = {
     inventory: []
 };
 
-// Load item configurations
-let itemConfig;
-try {
-    itemConfig = JSON.parse(fs.readFileSync('config/items.json', 'utf8'));
-} catch (error) {
-    console.error('Error reading items configuration file:', error);
-    process.exit(1);
-}
-
 // Get colors from the configuration
 const playerColor = chalk[config.playerColor] || chalk.green;
 const itemColor = chalk[config.itemColor] || chalk.yellow;
-const emptySpaceColor = chalk[config.emptySpaceColor] || chalk.white;
 
 // Initialize items from map configuration with their locations
-let fullItems = mapConfig.items.map(({ key, x, y }) => createItemInstance(key, x, y));
+let items = mapConfig.items.map(({ key, x, y }) => createItemInstance(key, x, y));
 
 // Function to create item instances based on configuration and location
 function createItemInstance(itemKey, x, y) {
@@ -107,7 +84,7 @@ function drawMap() {
         for (let x = startX; x < endX; x++) {
             if (x === player.x && y === player.y) {
                 row.push(playerColor('@')); // Player position
-            } else if (fullItems.some(item => item.x === x && item.y === y)) {
+            } else if (items.some(item => item.x === x && item.y === y)) {
                 row.push(itemColor('I')); // Item position
             } else {
                 const terrainType = terrain[y][x];
@@ -140,7 +117,7 @@ function showTerrainUnderPlayer() {
 
 // Check if the player is on an item and display a message
 function checkForItemUnderPlayer() {
-    const item = fullItems.find(item => item.x === player.x && item.y === player.y);
+    const item = items.find(item => item.x === player.x && item.y === player.y);
     if (item) {
         console.log(itemColor(`You see a ${item.name} here: ${item.description}`));
     }
@@ -148,9 +125,9 @@ function checkForItemUnderPlayer() {
 
 // Explicitly pick up an item when the player presses "P"
 function pickUpItem() {
-    const itemIndex = fullItems.findIndex(item => item.x === player.x && item.y === player.y);
+    const itemIndex = items.findIndex(item => item.x === player.x && item.y === player.y);
     if (itemIndex !== -1) {
-        const item = fullItems.splice(itemIndex, 1)[0];
+        const item = items.splice(itemIndex, 1)[0];
         player.inventory.push(item);
         console.log(chalk.blue(`You picked up a ${item.name}!`));
         

@@ -1,6 +1,5 @@
 {
     "playerColor": "blueBright",
     "itemColor": "white",
-    "exitColor": "redBright",
-    "emptySpaceColor": "gray"
+    "exitColor": "redBright"
 }
