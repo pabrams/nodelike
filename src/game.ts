@@ -1,11 +1,11 @@
 import readline from 'readline';
-import { Item, MeleeWeapon, Armor, Potion, Grenade, ItemAttributes, MeleeWeaponAttributes, ArmorAttributes, GrenadeAttributes } from './item.js';
+import { Item, MeleeWeapon, Armor, Potion, Grenade, ItemAttributes, MeleeWeaponAttributes, ArmorAttributes, GrenadeAttributes } from './item';
 import chalk from 'chalk';
 
-import config from './config/general.json' assert {type: 'json'};
-import mapj from './config/map.json' assert {type: 'json'};
-import itemConfigJson from './config/items.json' assert { type: 'json' };
-import terrainConfig from './config/terrainTypes.json' assert {type: 'json'};
+import config from '../config/general.json' assert {type: 'json'};
+import mapj from '../config/map.json' assert {type: 'json'};
+import itemConfigJson from '../config/items.json' assert { type: 'json' };
+import terrainConfig from '../config/terrainTypes.json' assert {type: 'json'};
 
 // Define a type for terrain visual configurations
 interface TerrainType {

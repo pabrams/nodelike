@@ -14,10 +14,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "blessed": "^0.1.81",
     "chalk": "^5.3.0"
   },
   "devDependencies": {
-    "@types/node": "^22.7.7",
-    "typescript": "^5.6.3"
+    "@types/blessed": "^0.1.25",
+    "@types/node": "^22.7.7"
   }
 }

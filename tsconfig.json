@@ -1,20 +1,16 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "nodenext",
-    "outDir": "./dist",
-    "rootDir": "./",
+    "target": "ES2020",
+    "module": "ESNext",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "moduleResolution": "nodenext"
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "rootDir": "./src",              // Specify root directory for source files
+    "moduleResolution": "Node"
   },
-  "include": [
-    "*.ts",
-    "config/**/*.json"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "config"]
 }
