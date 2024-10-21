@@ -1,5 +1,10 @@
 {
-    "playerColor": "blueBright",
-    "itemColor": "white",
-    "exitColor": "redBright"
+    "colors": {
+        "player": {"fg": "cyan"},
+        "items": {"fg": "yellow"}, 
+        "text": {"fg": "green"},
+        "punctuation1": {"fg": "red"},
+        "pertinent": {"fg" : "white"},
+        "heading": {"fg": "yellow"}
+    }
 }

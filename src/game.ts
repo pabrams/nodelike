@@ -1,6 +1,5 @@
-import readline from 'readline';
-import { Item, MeleeWeapon, Armor, Potion, Grenade, ItemAttributes, MeleeWeaponAttributes, ArmorAttributes, GrenadeAttributes } from './item';
-import chalk from 'chalk';
+import blessed from 'blessed';
+import { Item, MeleeWeapon, Armor, Potion, Grenade, ItemAttributes, MeleeWeaponAttributes, ArmorAttributes, GrenadeAttributes } from './item.js';
 
 import config from '../config/general.json' assert {type: 'json'};
 import mapj from '../config/map.json' assert {type: 'json'};
@@ -14,22 +13,12 @@ interface TerrainType {
     isPassable: boolean;
 }
 
-// Utility function to safely get a Chalk color function
-function getChalkColorFunction(color: string): (text: string) => string {
-    const chalkFunction = (chalk as any)[color];
-    if (typeof chalkFunction === 'function') {
-        return chalkFunction;
-    }
-    return chalk.white; // Fallback to white if the color function is not found
-}
-
-// Transform the terrain configuration to include dynamic chalk colors
 const terrainTypes: Record<string, TerrainType> = Object.fromEntries(
     Object.entries(terrainConfig).map(([key, value]) => [
         key,
         {
-            visual: getChalkColorFunction(value.colour)(key),
-            description: getChalkColorFunction(value.colour)(value.description),
+            visual: `{${value.fg}-fg}${key}{/${value.fg}-fg}`,
+            description: `{${value.fg}-fg}${value.description}{/${value.fg}-fg}`,
             isPassable: value.isPassable,
         }
     ])
@@ -61,11 +50,6 @@ const player: Player= {
     y: playerStart.y,
     inventory: []
 };
-
-// Get colors from the configuration
-const playerColor = getChalkColorFunction(config.playerColor);
-const itemColor = getChalkColorFunction(config.itemColor);
-
 
 // Define a type for the complete item config
 type ItemConfig = {
@@ -102,8 +86,62 @@ function createItemInstance(itemKey: string, x: number, y: number): Item | null 
 // Initialize items from map configuration with their locations
 let items: Item[] = mapConfig.items
     .map(({ key, x, y }) => createItemInstance(key, x, y))
-    .filter((item): item is Item => item !== null); // This ensures only Item instances remain
+    .filter((item): item is Item => item !== null);
 
+const screen = blessed.screen({
+    smartCSR: true
+});
+
+// Create a box perfectly centered horizontally and vertically.
+const mapPanel = blessed.box({
+    top: '0',           
+    left: '0',          
+    width: '100%',      
+    height: '80%',     
+    content: '',
+    tags: true,
+    border: {
+        type: 'line',
+    },
+    style: {
+        border: {
+            fg: 'cyan',
+        },
+        bg: 'black',
+        fg: 'magenta',
+    },
+});
+
+screen.append(mapPanel);
+
+const infoPanel  = blessed.box({
+    top: '80%',
+    left: '0',
+    width: '100%',
+    height: '20%',
+    content: '',
+    tags: true,
+    border: {
+        type: 'line',
+    },
+    style: {
+        border: {
+            fg: 'cyan',
+        },
+        bg: 'black',
+        fg: 'magenta',
+    },
+});
+
+function renderInfo(info: string) {
+    infoPanel.setContent(info);
+    screen.render();
+}
+
+function renderMap(mapString: string) {
+    mapPanel.setContent(mapString);
+    screen.render();
+}
 
 // Generate the game map based on the viewport
 function drawMap() {
@@ -118,10 +156,13 @@ function drawMap() {
     for (let y = startY; y < endY; y++) {
         const row = [];
         for (let x = startX; x < endX; x++) {
+            
+            const playercolor = `${config.colors.player.fg}-fg`;
+            const itemcolor = `${config.colors.items.fg}-fg`;
             if (x === player.x && y === player.y) {
-                row.push(playerColor('@')); // Player position
+                row.push(`{${playercolor}}@{/${playercolor}}`); // Player position
             } else if (items.some(item => item.attributes?.x === x && item.attributes?.y === y)) {
-                row.push(itemColor('I')); // Item position
+                row.push(`{${itemcolor}}I{/${itemcolor}}`); // Item positionafffff
             } else {
                 const terrainType = terrain[y][x];
                 if (terrainType && terrainTypes[terrainType].visual) {
@@ -129,124 +170,129 @@ function drawMap() {
                 }
             }
         }
-        map.push(row);
+        map.push(row.join(''));
     }
-    return map;
+    return map.join('\n');
 }
 
 // Display the generated map
-function displayMap(map: any[]) {
-    console.clear();
-    map.forEach((row: any[]) => {
-        console.log(row.join(''));
-    });
-    console.log(chalk.green('Use h for help.'));
-    showTerrainUnderPlayer();
+function displayMap() {
+    const mapString = drawMap();
+    renderMap(mapString);
 }
 
+function gameLoop() {
+    console.log('Welcome to the Nodelike Game!');
+    displayMap();
+    setupInput();
+}
+
+function showInfo(extraInfo: string){
+    
+    const infoText = 
+        showTerrainUnderPlayer() + '\n' + 
+        checkForItemUnderPlayer() + '\n' + 
+        extraInfo;
+    
+    renderInfo(infoText);
+}
+
+
 function showTerrainUnderPlayer() {
-    console.log (
-        chalk.blue('You are standing on ') + 
-        chalk.yellowBright(terrainTypes[mapConfig.terrain[player.y][player.x]].description)
-    )
+    const infoText = `{cyan-fg}You are standing on {/cyan-fg} + 
+        terrainTypes[mapConfig.terrain[player.y][player.x]].description`;
+    return infoText;
 }
 
 // Check if the player is on an item and display a message
 function checkForItemUnderPlayer() {
     const item = items.find(item => item?.attributes.x === player.x && item.attributes.y === player.y);
+    let itemText = '';
     if (item) {
-        console.log(itemColor(`You see a ${item.attributes.name} here: ${item.attributes.description}`));
+        itemText += `You see a ${item.attributes.name} here: ${item.attributes.description}`;
     }
+    return itemText
 }
 
 // Explicitly pick up an item when the player presses "P"
 function pickUpItem() {
     const itemIndex = items.findIndex(item => item.attributes.x === player.x && item.attributes.y === player.y);
+    let statusText;
+
     if (itemIndex !== -1) {
         const item = items.splice(itemIndex, 1)[0] as Item; // Assert item as Item
         player.inventory.push(item);
-        console.log(chalk.blue(`You picked up a ${item.attributes.name}!`)); // Access name via attributes
+
+        statusText = `{yellow-fg}You picked up a {white-fg}${item.attributes.name}{/white-fg}!{/yellow-fg}`;
 
         // Refresh the map to reflect the item removal
-        const map = drawMap();
-        displayMap(map);
+        displayMap();
     } else {
-        console.log(chalk.yellow('There is no item to pick up here.'));
+        statusText = '{red-fg}There is no item to pick up here.{/red-fg}';
     }
+    showInfo(statusText);
 }
 
-// Game loop
-function gameLoop() {
-    console.log('Welcome to the Nodelike Game!');
-    const map = drawMap();
-    displayMap(map);
-    setupInput();
-} 
-
-// Setup to read single keypress without pressing Enter
 function setupInput() {
-    readline.emitKeypressEvents(process.stdin);
-    process.stdin.setRawMode(true); 
-    process.stdin.on('keypress', (str, key) => {
-        if (key.ctrl && key.name === 'c') {
-            process.exit(); // Allow Ctrl+C to exit
-        } else if (key.name === 'h') {
-            displayHelp(); // Show help screen
-        } else if (key.name === 'q') {
-            console.log('You quit the game.');
-            process.exit();
-        } else if (key.name === 'i') {
-            displayInventory();
-        } else if (key.name === 'p') {
-            pickUpItem();
-        } else {
-            movePlayer(key.name); // Move the player
-            const map = drawMap(); // Draw the map after moving
-            displayMap(map); // Display the updated map
-            setImmediate(() => { // Use setImmediate to ensure output
-                checkForItemUnderPlayer(); // Check for items under the player
-            });
-        }
+    screen.key(['escape', 'q', 'C-c'], () => {
+        process.exit(0);
+    });
+
+    screen.key('h', () => displayHelp());
+    screen.key('i', () => displayInventory());
+    screen.key('p', () => pickUpItem());
+    screen.key(['w', 'a', 's', 'd'], (ch, key) => {
+        movePlayer(key.name);
+        displayMap(); // Draw the map after moving
     });
 }
 
 function displayHelp() {
-    console.clear();
-    console.log(chalk.green('Help Screen'));
-    console.log(chalk.yellow('Use the following keys to control the game:'));
-    console.log(
-        chalk.white('WASD') + 
-        chalk.yellowBright(' : ') + 
-        chalk.green('Move up, left, down, right.')
-    );
-    console.log(
-        chalk.white('P   ') + 
-        chalk.yellowBright(' : ') + 
-        chalk.green('Pick up items.')
-    );
-    console.log(
-        chalk.white('I   ') + 
-        chalk.yellowBright(' : ') + 
-        chalk.green('View intentory.')
-    );
-    console.log(
-        chalk.white('H   ') + 
-        chalk.yellowBright(' : ') + 
-        chalk.green('Show this help screen.')
-    );
-    console.log(
-        chalk.white('Q   ') + 
-        chalk.yellowBright(' : ') + 
-        chalk.green('Quit the game.')
-    );
-    console.log(chalk.green('Press any key to return to the game.'));
-    
-    readline.emitKeypressEvents(process.stdin);
-    process.stdin.setRawMode(true);
-    process.stdin.once('keypress', () => {
-        setupInput(); // Return to input mode
-        const map = drawMap();
-        displayMap(map);
+    const textColor = config.colors.text.fg;
+    const headingColor = config.colors.heading.fg;
+    const colonFg = `${config.colors.punctuation1.fg}-fg`;
+    const commandFg = `${config.colors.pertinent.fg}-fg`;
+    const helpText = [
+        `${textColor}Help Screen`,
+        `{${headingColor}-fg}Use the following keys to control the game:{/${headingColor}-fg}`,
+        `{${commandFg}}WASD{/${commandFg}}` + `{${colonFg}} : {/${colonFg}}` + `Move up, left, down, right.`,
+        `{${commandFg}}I   {/${commandFg}}` + `{${colonFg}} : {/${colonFg}}` + `View inventory.`,
+        `{${commandFg}}P   {/${commandFg}}` + `{${colonFg}} : {/${colonFg}}` + `Pick up items.`,
+        `{${commandFg}}H   {/${commandFg}}` + `{${colonFg}} : {/${colonFg}}` + `Show this help screen.`,
+        `{${commandFg}}Q   {/${commandFg}}` + `{${colonFg}} : {/${colonFg}}` + `Quit the game.{/${textColor}}`,
+    ].join('\n');
+    showPopupBox(helpText);
+}
+
+function showPopupBox(content: string){
+
+    const popupBox = blessed.box({
+        top: 'center',
+        left: 'center',
+        width: '50%',
+        height: '50%',
+        content: content,
+        border: {
+            type: 'line',
+        },
+        style: {
+            border: {
+                fg: 'white',
+            },
+            bg: 'black',
+            fg: 'white',
+        },
+    });
+
+    screen.append(popupBox);
+    screen.render();
+
+    popupBox.on('keypress', (ch, key) => {
+        if (key.name === 'escape' || key.name === 'q') {
+            popupBox.destroy();
+            setupInput();
+            displayMap(); // Return to the game
+        }
     });
 }
 
@@ -275,25 +321,32 @@ function movePlayer(direction: string) {
     if (isPassable(newX, newY)) {
         player.x = newX;
         player.y = newY;
-    } else {
-        console.log(chalk.red('You cannot move there. It is impassable!'));
+    } else {        
+        // Show an error message on the map
+        const message = '{red-fg}The terrain is impassable in that direction.{/red-fg}';
+        displayMap(); // Refresh the map display
+        renderMap(message);
     }
 
-    // Refresh the map display after moving
-    const map =  drawMap();
-    displayMap(map);
+    displayMap();
 }
 
-// Display player's inventory
+
 function displayInventory() {
-    console.log(chalk.green('Inventory:'));
+    const textColor = `${config.colors.text.fg}-fg`;
+    const headingColor = `${config.colors.heading.fg}-fg`;
+    let inventoryLines = [
+        `{${headingColor}}Inventory{/${headingColor}}`
+    ];
     if (player.inventory.length === 0) {
-        console.log('Your inventory is empty.');
+        inventoryLines.push(`{${textColor}}Your inventory is empty.{/${textColor}}`)
     } else {
         player.inventory.forEach((item, index) => {
-            console.log(`${index + 1}. ${item.getInfo()}`);
+            inventoryLines.push(`{blue-fg}${index + 1}{/blue-fg}. {${textColor}${item.getInfo()}{/${textColor}}`);
         });
     }
+    const inventoryText = inventoryLines.join('\n');
+    showPopupBox(inventoryText);
 }
 
 gameLoop();

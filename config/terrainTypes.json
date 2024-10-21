@@ -1,21 +1,22 @@
 {
     ".": {
-        "colour": "green",
+        "fg": "green",
         "description": "grass",
         "isPassable": true
     },
     ":": {
-        "colour": "gray",
+        "fg": "grey",
         "description": "gravel",
         "isPassable": true
     },
     "#": {
-        "colour": "bgGray",
+        "fg": "grey",
+        "bg": "white", 
         "description": "wall",
         "isPassable": false
     },
     " ": {
-        "colour": "yellow",
+        "fg": "white",
         "description": "dirt",
         "isPassable": true
     }
