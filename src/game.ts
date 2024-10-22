@@ -24,8 +24,8 @@ const terrainTypes: Record<string, TerrainType> = Object.fromEntries(
     ])
 );
 
-const viewportWidth = 20;
-const viewportHeight = 12;
+const viewportWidth = config.viewPort.map.width;
+const viewportHeight = config.viewPort.map.height;
 
 const mapConfig = {
     mapWidth: mapj.terrainRows[0].length,
@@ -94,10 +94,10 @@ const screen = blessed.screen({
 
 // Create a box perfectly centered horizontally and vertically.
 const mapPanel = blessed.box({
-    top: '0',           
-    left: '0',          
-    width: '100%',      
-    height: '80%',     
+    top: 'center',           
+    left: 'center',          
+    width: config.viewPort.box.width,      
+    height: config.viewPort.box.height,     
     content: '',
     tags: true,
     border: {
@@ -107,18 +107,18 @@ const mapPanel = blessed.box({
         border: {
             fg: 'cyan',
         },
-        bg: 'black',
-        fg: 'magenta',
+        bg: config.viewPort.box.bg,
+        fg: config.viewPort.box.fg,
     },
 });
 
 screen.append(mapPanel);
 
-const infoPanel  = blessed.box({
-    top: '80%',
-    left: '0',
-    width: '100%',
-    height: '20%',
+const infoPanel = blessed.box({
+    top: 0,
+    left: 'center',
+    width: '500',
+    height: '200',
     content: '',
     tags: true,
     border: {
@@ -132,6 +132,7 @@ const infoPanel  = blessed.box({
         fg: 'magenta',
     },
 });
+screen.append(infoPanel);
 
 function renderInfo(info: string) {
     infoPanel.setContent(info);
@@ -181,10 +182,10 @@ function displayMap() {
     renderMap(mapString);
 }
 
-function gameLoop() {
-    console.log('Welcome to the Nodelike Game!');
+function startGame() {
     displayMap();
     setupInput();
+    showInfo('Welcome to the Nodelike Game!');
 }
 
 function showInfo(extraInfo: string){
@@ -199,11 +200,9 @@ function showInfo(extraInfo: string){
 
 
 function showTerrainUnderPlayer() {
-    const infoText = `{cyan-fg}You are standing on {/cyan-fg} + 
-        terrainTypes[mapConfig.terrain[player.y][player.x]].description`;
+    const infoText = `{cyan-fg}You are standing on {/cyan-fg}${terrainTypes[mapConfig.terrain[player.y][player.x]].description}`;
     return infoText;
 }
-
 // Check if the player is on an item and display a message
 function checkForItemUnderPlayer() {
     const item = items.find(item => item?.attributes.x === player.x && item.attributes.y === player.y);
@@ -248,12 +247,12 @@ function setupInput() {
 }
 
 function displayHelp() {
-    const textColor = config.colors.text.fg;
-    const headingColor = config.colors.heading.fg;
+    const textColor = `${config.colors.text.fg}-fg`;
+    const headingColor = `${config.colors.heading.fg}-fg`;
     const colonFg = `${config.colors.punctuation1.fg}-fg`;
     const commandFg = `${config.colors.pertinent.fg}-fg`;
     const helpText = [
-        `${textColor}Help Screen`,
+        `{${textColor}}Help Screen{/${textColor}}`,
         `{${headingColor}-fg}Use the following keys to control the game:{/${headingColor}-fg}`,
         `{${commandFg}}WASD{/${commandFg}}` + `{${colonFg}} : {/${colonFg}}` + `Move up, left, down, right.`,
         `{${commandFg}}I   {/${commandFg}}` + `{${colonFg}} : {/${colonFg}}` + `View inventory.`,
@@ -265,13 +264,13 @@ function displayHelp() {
 }
 
 function showPopupBox(content: string){
-
     const popupBox = blessed.box({
         top: 'center',
         left: 'center',
         width: '50%',
         height: '50%',
         content: content,
+        tags: true,
         border: {
             type: 'line',
         },
@@ -285,15 +284,14 @@ function showPopupBox(content: string){
     });
 
     screen.append(popupBox);
+    popupBox.focus();
     screen.render();
 
     popupBox.on('keypress', (ch, key) => {
-        if (key.name === 'escape' || key.name === 'q') {
-            popupBox.destroy();
-            setupInput();
-            displayMap(); // Return to the game
-        }
+        popupBox.destroy();
+        displayMap();
     });
+
 }
 
 // Check if the terrain is passable at the specified coordinates
@@ -327,8 +325,8 @@ function movePlayer(direction: string) {
         displayMap(); // Refresh the map display
         renderMap(message);
     }
-
     displayMap();
+    showInfo("");
 }
 
 
@@ -349,4 +347,4 @@ function displayInventory() {
     showPopupBox(inventoryText);
 }
 
-gameLoop();
+startGame();

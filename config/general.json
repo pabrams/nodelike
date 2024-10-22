@@ -6,5 +6,20 @@
         "punctuation1": {"fg": "red"},
         "pertinent": {"fg" : "white"},
         "heading": {"fg": "yellow"}
+    },
+    "viewPort": {
+        "map": {
+            "width": 24, 
+            "height": 10
+        },
+        "box": {
+            "width": 26, 
+            "height": 12,
+            "bg": "black",
+            "fg": "magenta",
+            "border": {
+                "fg": "cyan"
+            }
+        }
     }
 }
