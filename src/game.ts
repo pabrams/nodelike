@@ -94,8 +94,8 @@ const screen = blessed.screen({
 
 // Create a box perfectly centered horizontally and vertically.
 const mapPanel = blessed.box({
-    top: 'center',           
-    left: 'center',          
+    top: config.viewPort.box.top,            
+    left: config.viewPort.box.left,          
     width: config.viewPort.box.width,      
     height: config.viewPort.box.height,     
     content: '',
@@ -107,6 +107,11 @@ const mapPanel = blessed.box({
         border: {
             fg: 'cyan',
         },
+        focus: {
+            border: {
+                fg: 'yellow',
+            }, 
+        },
         bg: config.viewPort.box.bg,
         fg: config.viewPort.box.fg,
     },
@@ -115,10 +120,10 @@ const mapPanel = blessed.box({
 screen.append(mapPanel);
 
 const infoPanel = blessed.box({
-    top: 0,
-    left: 'center',
-    width: '500',
-    height: '200',
+    top: config.infoPanel.top,
+    left: config.infoPanel.left,
+    width: config.infoPanel.width,
+    height: config.infoPanel.height,
     content: '',
     tags: true,
     border: {
@@ -127,6 +132,11 @@ const infoPanel = blessed.box({
     style: {
         border: {
             fg: 'cyan',
+        },
+        focus: {
+            border: {
+                fg: 'yellow',
+            }, 
         },
         bg: 'black',
         fg: 'magenta',
@@ -157,13 +167,10 @@ function drawMap() {
     for (let y = startY; y < endY; y++) {
         const row = [];
         for (let x = startX; x < endX; x++) {
-            
-            const playercolor = `${config.colors.player.fg}-fg`;
-            const itemcolor = `${config.colors.items.fg}-fg`;
             if (x === player.x && y === player.y) {
-                row.push(`{${playercolor}}@{/${playercolor}}`); // Player position
+                row.push(config.chars.player); // Player position
             } else if (items.some(item => item.attributes?.x === x && item.attributes?.y === y)) {
-                row.push(`{${itemcolor}}I{/${itemcolor}}`); // Item positionafffff
+                row.push(config.chars.item); // Item position    
             } else {
                 const terrainType = terrain[y][x];
                 if (terrainType && terrainTypes[terrainType].visual) {
@@ -247,18 +254,19 @@ function setupInput() {
 }
 
 function displayHelp() {
-    const textColor = `${config.colors.text.fg}-fg`;
-    const headingColor = `${config.colors.heading.fg}-fg`;
+    const textFg = `${config.colors.text.fg}-fg`;
+    const headingFg = `${config.colors.heading.fg}-fg`;
     const colonFg = `${config.colors.punctuation1.fg}-fg`;
+    const colon = `{${colonFg}} : {/${colonFg}}`
     const commandFg = `${config.colors.pertinent.fg}-fg`;
     const helpText = [
-        `{${textColor}}Help Screen{/${textColor}}`,
-        `{${headingColor}-fg}Use the following keys to control the game:{/${headingColor}-fg}`,
-        `{${commandFg}}WASD{/${commandFg}}` + `{${colonFg}} : {/${colonFg}}` + `Move up, left, down, right.`,
-        `{${commandFg}}I   {/${commandFg}}` + `{${colonFg}} : {/${colonFg}}` + `View inventory.`,
-        `{${commandFg}}P   {/${commandFg}}` + `{${colonFg}} : {/${colonFg}}` + `Pick up items.`,
-        `{${commandFg}}H   {/${commandFg}}` + `{${colonFg}} : {/${colonFg}}` + `Show this help screen.`,
-        `{${commandFg}}Q   {/${commandFg}}` + `{${colonFg}} : {/${colonFg}}` + `Quit the game.{/${textColor}}`,
+        `{${headingFg}}Help Screen{/${headingFg}}`,
+        `{${textFg}}Use the following keys to control the game:`,
+        `{${commandFg}}WASD{/${commandFg}}${colon}Move up, left, down, right.`,
+        `{${commandFg}}I   {/${commandFg}}${colon}View inventory.`,
+        `{${commandFg}}P   {/${commandFg}}${colon}Pick up items.`,
+        `{${commandFg}}H   {/${commandFg}}${colon}Show this help screen.`,
+        `{${commandFg}}Q   {/${commandFg}}${colon}Quit the game.{/${textFg}}`,
     ].join('\n');
     showPopupBox(helpText);
 }
@@ -277,6 +285,11 @@ function showPopupBox(content: string){
         style: {
             border: {
                 fg: 'white',
+            },
+            focus: {
+                border: {
+                    fg: 'yellow',
+                }, 
             },
             bg: 'black',
             fg: 'white',
@@ -340,7 +353,7 @@ function displayInventory() {
         inventoryLines.push(`{${textColor}}Your inventory is empty.{/${textColor}}`)
     } else {
         player.inventory.forEach((item, index) => {
-            inventoryLines.push(`{blue-fg}${index + 1}{/blue-fg}. {${textColor}${item.getInfo()}{/${textColor}}`);
+            inventoryLines.push(`{blue-fg}${index + 1}{/blue-fg}. {${textColor}}${item.getInfo()}{/${textColor}}`);
         });
     }
     const inventoryText = inventoryLines.join('\n');

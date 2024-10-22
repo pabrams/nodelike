@@ -1,25 +1,36 @@
 {
     "colors": {
-        "player": {"fg": "cyan"},
         "items": {"fg": "yellow"}, 
         "text": {"fg": "green"},
         "punctuation1": {"fg": "red"},
         "pertinent": {"fg" : "white"},
         "heading": {"fg": "yellow"}
     },
+    "chars": {
+        "player": "{magenta-fg}{bold}{blue-bg}@{/magenta-fg}{/bold}{/blue-bg}",
+        "item": "{red-fg}{bold}*{/red-fg}{/bold}"
+    },
     "viewPort": {
         "map": {
-            "width": 24, 
-            "height": 10
+            "width": 48,
+            "height": 22
         },
         "box": {
-            "width": 26, 
-            "height": 12,
+            "top": 0,
+            "left": 0,
+            "width": "32%", 
+            "height": "50%",
             "bg": "black",
             "fg": "magenta",
             "border": {
                 "fg": "cyan"
             }
         }
+    },
+    "infoPanel": {
+        "top": "50%",
+        "left": 0,
+        "width": "32%",
+        "height": "20%"
     }
 }
