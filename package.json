@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@types/blessed": "^0.1.25",
-    "@types/node": "^22.7.7"
+    "@types/node": "^22.7.7",
+    "tsx": "^4.19.1"
   }
 }

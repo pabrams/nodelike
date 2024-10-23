@@ -15,6 +15,16 @@
         "description": "wall",
         "isPassable": false
     },
+    "!": {
+        "fg": "grey",
+        "description": "dead tree",
+        "isPassable": true
+    },
+    "%": {
+        "fg": "green",
+        "description": "apple tree",
+        "isPassable": true
+    },
     " ": {
         "fg": "white",
         "description": "dirt",

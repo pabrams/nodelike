@@ -105,11 +105,11 @@ const mapPanel = blessed.box({
     },
     style: {
         border: {
-            fg: 'cyan',
+            fg: '#880088',
         },
         focus: {
             border: {
-                fg: 'yellow',
+                fg: '#ff00ff',
             }, 
         },
         bg: config.viewPort.box.bg,
@@ -131,11 +131,11 @@ const infoPanel = blessed.box({
     },
     style: {
         border: {
-            fg: 'cyan',
+            fg: '#cccc00',
         },
         focus: {
             border: {
-                fg: 'yellow',
+                fg: '#ffff00',
             }, 
         },
         bg: 'black',
@@ -154,15 +154,57 @@ function renderMap(mapString: string) {
     screen.render();
 }
 
+const debugPanel = blessed.box({
+    top: config.debugPanel.top,
+    left: config.debugPanel.left,
+    width: config.debugPanel.width * 1.50,
+    height: config.debugPanel.height,
+    content: '',
+    tags: true,
+    border: {
+        type: 'line',
+    },
+});
+
+let debugContent: string[] = [];
+    
+if (config.debug){
+    screen.append(debugPanel);
+}
+
 // Generate the game map based on the viewport
 function drawMap() {
     const map = [];
-
+    debugContent = [];
     // Calculate the top-left corner of the viewport
-    const startX = Math.max(0, player.x - Math.floor(viewportWidth / 2));
-    const startY = Math.max(0, player.y - Math.floor(viewportHeight / 2));
+    const halfX = Math.floor(viewportWidth / 2);
+    const halfY = Math.floor(viewportHeight / 2);
+    const startX = Math.min(Math.max(0, player.x - halfX), mapWidth - viewportWidth);
+    const startY = Math.min(Math.max(0, player.y - halfY), mapHeight - viewportHeight);
     const endX = Math.min(mapWidth, startX + viewportWidth);
     const endY = Math.min(mapHeight, startY + viewportHeight);
+
+    if (config.debug){
+        debugContent.push(`view size:{|}${viewportWidth},${viewportHeight}`);
+        debugContent.push(`start offset: {|}${startX},${startY}`);
+        debugContent.push(`end offset: {|}${endX},${endY}`);
+        debugContent.push(`map size: {|}${mapWidth},${mapHeight}`);
+        debugContent.push(`player pos: {|}${player.x},${player.y}`);
+        debugContent.push(`relative pos: {|}${viewportWidth - player.x},${viewportHeight - player.y}`);
+        debugContent.push(`halfView: {|}${halfX},${halfY}`);
+        debugContent.push(` `);
+        debugContent.push(`viewportWidth: {|} ${viewportWidth}`);   
+        debugContent.push(`player.x: {|} ${player.x}`);
+        debugContent.push(`halfX: {|} ${halfX}`);
+        debugContent.push(`player.x - halfX: {|} ${player.x - halfX}`);
+        debugContent.push(`startX (Math.max(0, player.x - halfX)): {|} ${startX}`);
+        debugContent.push(`startX (Math.max(0, ${player.x - halfX})): {|} ${startX}`);
+        debugContent.push(`endX (Math.min(mapWidth, startX + viewportWidth)): {|} ${endX}`);
+        debugContent.push(`endX (Math.min(${mapWidth}, ${startX + viewportWidth})): {|} ${endX}`);
+        
+        debugPanel.setContent(debugContent.join('\n'));
+        screen.render();
+    }
 
     for (let y = startY; y < endY; y++) {
         const row = [];
@@ -191,8 +233,8 @@ function displayMap() {
 
 function startGame() {
     displayMap();
+    showInfo("");
     setupInput();
-    showInfo('Welcome to the Nodelike Game!');
 }
 
 function showInfo(extraInfo: string){
@@ -288,7 +330,7 @@ function showPopupBox(content: string){
             },
             focus: {
                 border: {
-                    fg: 'yellow',
+                    fg: '#ffff00',
                 }, 
             },
             bg: 'black',

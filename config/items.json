@@ -55,5 +55,29 @@
         "damage_type": "piercing",
         "x": 0,
         "y": 0
+    },
+    "lead-pipe": {
+        "name": "lead pipe",
+        "type": "melee_weapon",
+        "description": "A heavy lead pipe. Quite effective as a cudgel.",
+        "weight": 1,
+        "average_market_price": 25,
+        "rarity": "common",
+        "damage_range": "2-5",
+        "damage_type": "bludgeoningS",
+        "x": 0,
+        "y": 0
+    },
+    "9mm-Pistol": {
+        "name": "9mm Pistol",
+        "type": "ranged_weapon",
+        "description": "A firearm.",
+        "weight": 1,
+        "average_market_price": 25,
+        "rarity": "common",
+        "damage_range": "2-5",
+        "damage_type": "piercing",
+        "x": 0,
+        "y": 0
     }
 }

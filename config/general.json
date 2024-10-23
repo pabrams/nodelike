@@ -12,14 +12,14 @@
     },
     "viewPort": {
         "map": {
-            "width": 48,
+            "width":  72,
             "height": 22
         },
         "box": {
             "top": 0,
             "left": 0,
-            "width": "32%", 
-            "height": "50%",
+            "width": 74, 
+            "height": 24,
             "bg": "black",
             "fg": "magenta",
             "border": {
@@ -28,9 +28,16 @@
         }
     },
     "infoPanel": {
-        "top": "50%",
+        "top": 24,
         "left": 0,
-        "width": "32%",
-        "height": "20%"
+        "width": 74,
+        "height": 10
+    },
+    "debug": false,
+    "debugPanel": {
+        "top": 0,
+        "left": 74,
+        "width": 40,
+        "height": 32
     }
 }
