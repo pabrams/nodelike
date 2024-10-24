@@ -1,0 +1,27 @@
+{
+    
+    "key": "bandits1",
+    "intentions": "hostile",
+    "description": "A man, a woman, and their dog.",
+    "Long_description": "They are twitching and moving strangely. Nerve damage, you think to yourself, grimly. Probably hopped up on stimulants.", 
+    "members": 
+    [
+        {
+            "key": "human1",
+            "label": "A male bandit",
+            "race": "human",
+            "alignment":  "chaotic evil",
+            "stats": [12, 13, 14, 15, 16, 17]
+        },
+        {
+            "key": "human2", 
+            "label": "A female bandit",
+            "race": "human",
+            "alignment":  "chaotic evil",
+            
+
+        }
+
+    ]
+
+}

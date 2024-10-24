@@ -1,0 +1,25 @@
+{
+    "races": 
+    [
+        {
+            "name": "Dwarf"
+        },
+        {
+            "name": "Elf"
+        },
+        {
+            "name": "Human"
+        },
+        {
+            "name": "Half-Elf"
+        },
+        {
+            "name": "Halfling"
+        },
+        {
+                        
+        }
+
+    ]
+
+}

@@ -8,7 +8,8 @@
     },
     "chars": {
         "player": "{magenta-fg}{bold}{blue-bg}@{/magenta-fg}{/bold}{/blue-bg}",
-        "item": "{red-fg}{bold}*{/red-fg}{/bold}"
+        "item": "{#aa0000-fg}*{/aa0000-fg}",
+        "mob": "{#ff0000-fg}{bold}&{/#ff0000-fg}{/bold}"
     },
     "viewPort": {
         "map": {
