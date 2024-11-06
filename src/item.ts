@@ -1,4 +1,6 @@
 // item.ts
+import {Dice} from './Dice';
+
 interface ItemAttributes {
     name: string;
     type: 'melee_weapon' | 'armor' | 'potion' | 'grenade' | 'default'; 
@@ -10,10 +12,20 @@ interface ItemAttributes {
     y: number;
 }
 
+type MeleeDamageType = 'piercing' | 'blunt' | 'slashing';
+
 // Define specific item types
 interface MeleeWeaponAttributes extends ItemAttributes {
-    damage_range: string;
-    damage_type: string;
+    damageDice: Dice;
+    damageType: MeleeDamageType;
+    finesse: boolean;
+    thrown: boolean;
+    heavy: boolean;
+    light: boolean;
+    reach: number; // units to add to personal reach when attacking
+    two_handed: boolean;
+    versatileDamage: number; // damage added when two hands are used
+    
 }
 
 interface ArmorAttributes extends ItemAttributes {
@@ -40,13 +52,8 @@ class Item {
 }
 
 class MeleeWeapon extends Item {
-    damageRange: string;
-    damageType: string;
-
     constructor(attributes: MeleeWeaponAttributes) {
-        super(attributes);
-        this.damageRange = attributes.damage_range;
-        this.damageType = attributes.damage_type;
+        super(attributes); 
     }
 
     getInfo(): string {

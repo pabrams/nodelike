@@ -4,6 +4,7 @@ import { Item, MeleeWeapon, Armor, Potion, Grenade, ItemAttributes, MeleeWeaponA
 import config from '../config/general.json' assert {type: 'json'};
 import mapj from '../config/map.json' assert {type: 'json'};
 import itemConfigJson from '../config/items.json' assert { type: 'json' };
+import mobsConfigJson from '../config/mobs.json' assert { type: 'json'}
 import terrainConfig from '../config/terrainTypes.json' assert {type: 'json'};
 
 // Define a type for terrain visual configurations
@@ -32,7 +33,8 @@ const mapConfig = {
     mapHeight: mapj.terrainRows.length,
     playerStart: {"x": 1, "y": 1},
     terrain: mapj.terrainRows,
-    items: mapj.items
+    items: mapj.items,
+    mobs: mapj.mobs
 };
 
 
@@ -55,10 +57,44 @@ const player: Player= {
 type ItemConfig = {
     [key: string]: ItemAttributes | MeleeWeaponAttributes | ArmorAttributes | GrenadeAttributes;
 };
+type Race = 'human'|'canine'|'zombie'|'mutant';
+type Ethics = 'lawful' | 'true' | 'chaotic';
+type Morality = 'good' | 'neutral' | 'evil';
+type Alignment = Ethics & Morality;
+type Attitude = 'hostile' | 'neutral' | 'friendly';
+
+interface Mob {
+    "name": string,
+    "description": string,
+    "race": Race,
+    "level": number,
+    "hitPointsMax": number,
+    "hitPoints": number,
+    "alignment": Alignment,
+    "attributes": {
+        "str": number,
+        "dex": number,
+        "agl": number,
+        "spd": number,
+        "con": number,
+        "int": number,
+        "wis": number,
+        "cha": number
+    }
+}
+
+interface GroupOfMobs {
+    [key: string]: {
+        "intentions": Attitude,
+        "description": string,
+        "long_description": string,
+        "members": Mob[]
+    }
+}
 
 // Cast the imported JSON to the defined type
 const itemConfig: ItemConfig = itemConfigJson as ItemConfig;
-
+const mobsConfig: MobsConfig = mobsConfigJson as MobsConfig;
 function createItemInstance(itemKey: string, x: number, y: number): Item | null {
     const itemDetail = itemConfig[itemKey];
     if (!itemDetail) {
@@ -211,6 +247,7 @@ function drawMap() {
         for (let x = startX; x < endX; x++) {
             if (x === player.x && y === player.y) {
                 row.push(config.chars.player); // Player position
+                if (mobsconfig.)
             } else if (items.some(item => item.attributes?.x === x && item.attributes?.y === y)) {
                 row.push(config.chars.item); // Item position    
             } else {

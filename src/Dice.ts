@@ -1,6 +1,6 @@
 import { resourceLimits } from "worker_threads";
 
-class Dice {
+export class Dice {
     private quantity: number;       // Number of dice to roll
     private sides: number;          // Number of sides per die
     private advantage: boolean = false;   // If advantaged, roll two dice for each one, and choose the highest of two numbers rolled.
