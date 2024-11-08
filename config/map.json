@@ -60,7 +60,8 @@
         { "key": "9mm-Pistol", "x": 51, "y": 60 }
     ],
     "mobs": [
-        {"key": "bandits1", "x": 9, "y": 66},
-        {"key": "bandits2", "x": 41, "y": 76}
+        {"key": "bandits1", "x": 9, "y": 9},
+        {"key": "bandits2", "x": 41, "y": 76},
+        {"key": "bandits1", "x": 12, "y": 56}
     ]
 }

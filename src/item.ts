@@ -25,7 +25,6 @@ interface MeleeWeaponAttributes extends ItemAttributes {
     reach: number; // units to add to personal reach when attacking
     two_handed: boolean;
     versatileDamage: number; // damage added when two hands are used
-    
 }
 
 interface ArmorAttributes extends ItemAttributes {
@@ -57,7 +56,7 @@ class MeleeWeapon extends Item {
     }
 
     getInfo(): string {
-        return `${super.getInfo()} | Damage: ${this.damageRange} (${this.damageType})`;
+        return `${super.getInfo()}`;
     }
 }
 
@@ -97,4 +96,4 @@ class Grenade extends Item {
     }
 }
 
-export { Item, MeleeWeapon, Armor, Potion, Grenade, ItemAttributes, MeleeWeaponAttributes, ArmorAttributes, GrenadeAttributes };
+            export { Item, MeleeWeapon, Armor, Potion, Grenade, ItemAttributes, MeleeWeaponAttributes, ArmorAttributes, GrenadeAttributes };

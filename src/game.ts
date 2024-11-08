@@ -7,6 +7,8 @@ import itemConfigJson from '../config/items.json' assert { type: 'json' };
 import mobsConfigJson from '../config/mobs.json' assert { type: 'json'}
 import terrainConfig from '../config/terrainTypes.json' assert {type: 'json'};
 
+import { MobGroup, Mob, GroupOfMobsPositioned } from './mobs.js';
+
 // Define a type for terrain visual configurations
 interface TerrainType {
     visual: string;
@@ -41,6 +43,7 @@ const mapConfig = {
 const { mapWidth, mapHeight, playerStart, terrain } = mapConfig;
 
 interface Player {
+    partyMembers: MobGroup;
     x: number;
     y: number;
     inventory: Item[]; // Ensure inventory is defined as an array of Item
@@ -48,6 +51,7 @@ interface Player {
 
 // Initialize game state based on the parsed configuration
 const player: Player= {
+    
     x: playerStart.x,
     y: playerStart.y,
     inventory: []
@@ -57,44 +61,10 @@ const player: Player= {
 type ItemConfig = {
     [key: string]: ItemAttributes | MeleeWeaponAttributes | ArmorAttributes | GrenadeAttributes;
 };
-type Race = 'human'|'canine'|'zombie'|'mutant';
-type Ethics = 'lawful' | 'true' | 'chaotic';
-type Morality = 'good' | 'neutral' | 'evil';
-type Alignment = Ethics & Morality;
-type Attitude = 'hostile' | 'neutral' | 'friendly';
-
-interface Mob {
-    "name": string,
-    "description": string,
-    "race": Race,
-    "level": number,
-    "hitPointsMax": number,
-    "hitPoints": number,
-    "alignment": Alignment,
-    "attributes": {
-        "str": number,
-        "dex": number,
-        "agl": number,
-        "spd": number,
-        "con": number,
-        "int": number,
-        "wis": number,
-        "cha": number
-    }
-}
-
-interface GroupOfMobs {
-    [key: string]: {
-        "intentions": Attitude,
-        "description": string,
-        "long_description": string,
-        "members": Mob[]
-    }
-}
 
 // Cast the imported JSON to the defined type
 const itemConfig: ItemConfig = itemConfigJson as ItemConfig;
-const mobsConfig: MobsConfig = mobsConfigJson as MobsConfig;
+const mobsConfig = mobsConfigJson;
 function createItemInstance(itemKey: string, x: number, y: number): Item | null {
     const itemDetail = itemConfig[itemKey];
     if (!itemDetail) {
@@ -108,7 +78,7 @@ function createItemInstance(itemKey: string, x: number, y: number): Item | null 
     switch (itemDetail.type) {
         case 'melee_weapon':
             return new MeleeWeapon(commonAttributes as MeleeWeaponAttributes);
-        case 'armor':
+        case 'armor':   
             return new Armor(commonAttributes as ArmorAttributes);
         case 'potion':
             return new Potion(commonAttributes as ItemAttributes);
@@ -119,10 +89,27 @@ function createItemInstance(itemKey: string, x: number, y: number): Item | null 
     }
 }
 
+function createMobgroupInstance(mobKey: string, x: number, y: number): MobGroup | null {
+    const mobDetail = mobsConfig.mobGroups.find((mobGroup) => mobGroup.ID === mobKey);
+    if (!mobDetail) {
+        console.error(`Mobgroup not found: ${mobKey}`);
+        return null;
+    }
+    return new GroupOfMobsPositioned(mobDetail, x, y);  
+}
+
+function combat(mobGroup: MobGroup, mobGroup: MobGroup) : void {
+
+}
+
 // Initialize items from map configuration with their locations
 let items: Item[] = mapConfig.items
     .map(({ key, x, y }) => createItemInstance(key, x, y))
     .filter((item): item is Item => item !== null);
+
+let mapMobs = mapConfig.mobs
+    .map(({key, x, y}) => createMobgroupInstance(key, x, y))
+    .filter((mobGroup): mobGroup is GroupOfMobsPositioned => mobGroup !== null);
 
 const screen = blessed.screen({
     smartCSR: true
@@ -247,9 +234,11 @@ function drawMap() {
         for (let x = startX; x < endX; x++) {
             if (x === player.x && y === player.y) {
                 row.push(config.chars.player); // Player position
-                if (mobsconfig.)
-            } else if (items.some(item => item.attributes?.x === x && item.attributes?.y === y)) {
-                row.push(config.chars.item); // Item position    
+            } else if (mapMobs.some((mobGroup) => mobGroup.x === x && mobGroup.y === y)) {
+                row.push(config.chars.mob);
+            }
+            else if (items.some(item => item.attributes?.x === x && item.attributes?.y === y)) {
+                row.push(config.chars.item);
             } else {
                 const terrainType = terrain[y][x];
                 if (terrainType && terrainTypes[terrainType].visual) {
@@ -411,6 +400,11 @@ function movePlayer(direction: string) {
     if (isPassable(newX, newY)) {
         player.x = newX;
         player.y = newY;
+
+        if (mapMobs.some(mob => mob.x === player.x && mob.y === player.y)) {
+            const mobGroup = mapMobs.find(mob => mob.x === player.x && mob.y === player.y);
+            combat(player, mobGroup);
+        }
     } else {        
         // Show an error message on the map
         const message = '{red-fg}The terrain is impassable in that direction.{/red-fg}';

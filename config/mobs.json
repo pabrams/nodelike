@@ -1,59 +1,124 @@
 
 {
-    
-    "bandits1": {
-        "intentions": "hostile",
-        "description": "A man, a woman, and their dog.",
-        "long_description": "They are twitching and moving strangely. Nerve damage, you think to yourself, grimly. Probably hopped up on stimulants.", 
-        "members": 
-        [
-            {
-                "name": "human1",
-                "label": "A male bandit",
-                "race": "human",
-                "class": "rogue",
-                "level": 1,
-                "hp": 11,
-                "alignment":  "chaotic evil",
-                "stats": [12, 14, 11, 9, 6, 6]
-            },
-            {
-                "name": "human2", 
-                "label": "A female bandit",
-                "race": "human",
-                "class": "fighter",
-                "level": 1,
-                "hp": 12,
-                "alignment":  "chaotic evil",
-                "stats": [13, 10, 14, 8, 7, 10]
-            },
-            {
-                "name": "dog1",
-                "label": "A pitbull",
-                "race": "canine",
-                "class": "barbarian",
-                "level": 1, 
-                "hp": 7,
-                "alignment": "chaotic evil",
-                "stats": [14, 16, 8, 1, 3, 5]
-            }
-        ]
-    },
-    "bandits2": {
-        "intentions": "hostile",
-        "description": "A lone fighter.",
-        "Long_description": "A nondescript man.", 
-        "members": [
-            {
-                "name": "human3",
-                "label": "A male bandit",
-                "race": "human",
-                "class": "fighter",
-                "level": 2,
-                "hp": 18,
-                "alignment":  "chaotic evil",
-                "stats": [14, 13, 15, 8, 6, 9]
-            }
-        ]
-    }
+    "mobGroups": [
+        {
+            "ID": "player_party",
+            "intentions": "allied",
+            "description": "A group of friendly characters",
+            "longDescription": "They are gathered around a campfire, drinking and laughing. They are a mix of humans, elves, and dwarves.", 
+            "members": [
+                {
+                    "name": "elf1",
+                    "description": "A friendly elf",
+                    "race": "elf",
+                    "class": "warrior",
+                    "level": 1,
+                    "hp": 15,
+                    "alignment":  "good",
+                    "attributes": {
+                        "str": 14,
+                        "dex": 17,
+                        "agl": 16,
+                        "spd": 16,
+                        "con": 12,
+                        "int": 17,
+                        "wis": 16,
+                        "cha": 14
+                    }
+                }
+            ]
+        },
+        {
+            "ID": "bandits1",
+            "intentions": "hostile",
+            "description": "A man, a woman, and their dog.",
+            "longDescription": "They are twitching and moving strangely. Nerve damage, you think to yourself, grimly. Probably hopped up on stimulants.", 
+            "members": [
+                {
+                    "name": "human1",
+                    "description": "A male bandit",
+                    "race": "human",
+                    "class": "rogue",
+                    "level": 1,
+                    "hp": 11,
+                    "alignment":  "chaotic evil",
+                    "attributes": {
+                        "str": 14,
+                        "dex": 12,
+                        "agl": 10,
+                        "spd": 10,
+                        "con": 8,
+                        "int": 13,
+                        "wis": 10,
+                        "cha": 7
+                    }
+                },
+                {
+                    "name": "human2", 
+                    "description": "A female bandit",
+                    "race": "human",
+                    "class": "fighter",
+                    "level": 1,
+                    "hp": 12,
+                    "alignment":  "chaotic evil",
+                    "attributes": {
+                        "str": 14,
+                        "dex": 12,
+                        "agl": 10,
+                        "spd": 10,
+                        "con": 8,
+                        "int": 13,
+                        "wis": 10,
+                        "cha": 7
+                    }
+                },
+                {
+                    "name": "dog1",
+                    "description": "A pitbull",
+                    "race": "canine",
+                    "class": "barbarian",
+                    "level": 1, 
+                    "hp": 7,
+                    "alignment": "chaotic evil",
+                    "attributes": {
+                        "str": 14,
+                        "dex": 12,
+                        "agl": 10,
+                        "spd": 10,
+                        "con": 8,
+                        "int": 13,
+                        "wis": 10,
+                        "cha": 7
+                    }
+                }
+            ]
+        },
+        {
+            "ID": "bandits2",
+            "intentions": "hostile",
+            "description": "A lone fighter.",
+            "longDescription": "A nondescript man.", 
+            "members": [
+                {
+                    "name": "human3",
+                    "description": "A male bandit",
+                    "race": "human",
+                    "class": "fighter",
+                    "level": 2,
+                    "hp": 18,
+                    "alignment":  "chaotic evil",
+                    "attributes": {
+                        "str": 14,
+                        "dex": 12,
+                        "agl": 10,
+                        "spd": 10,
+                        "con": 8,
+                        "int": 13,
+                        "wis": 10,
+                        "cha": 7
+                    }
+                }
+            ]
+        }
+    ]
 }
