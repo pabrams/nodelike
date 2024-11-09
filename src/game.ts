@@ -4,7 +4,7 @@ import { Item, MeleeWeapon, Armor, Potion, Grenade, ItemAttributes, MeleeWeaponA
 import config from '../config/general.json' assert {type: 'json'};
 import mapj from '../config/map.json' assert {type: 'json'};
 import itemConfigJson from '../config/items.json' assert { type: 'json' };
-import mobsConfigJson from '../config/mobs.json' assert { type: 'json'}
+import mobsConfig from '../config/mobs.json' assert { type: 'json'}
 import terrainConfig from '../config/terrainTypes.json' assert {type: 'json'};
 
 import { MobGroup, Mob, GroupOfMobsPositioned } from './mobs.js';
@@ -51,7 +51,7 @@ interface Player {
 
 // Initialize game state based on the parsed configuration
 const player: Player= {
-    
+    partyMembers: mobsConfigmobGroups[0],
     x: playerStart.x,
     y: playerStart.y,
     inventory: []
@@ -64,7 +64,6 @@ type ItemConfig = {
 
 // Cast the imported JSON to the defined type
 const itemConfig: ItemConfig = itemConfigJson as ItemConfig;
-const mobsConfig = mobsConfigJson;
 function createItemInstance(itemKey: string, x: number, y: number): Item | null {
     const itemDetail = itemConfig[itemKey];
     if (!itemDetail) {
@@ -98,8 +97,8 @@ function createMobgroupInstance(mobKey: string, x: number, y: number): MobGroup 
     return new GroupOfMobsPositioned(mobDetail, x, y);  
 }
 
-function combat(mobGroup: MobGroup, mobGroup: MobGroup) : void {
-
+function combat(mobGroup1: MobGroup | GroupOfMobsPositioned, mobGroup2: MobGroup | GroupOfMobsPositioned) : void {
+    
 }
 
 // Initialize items from map configuration with their locations
@@ -403,9 +402,9 @@ function movePlayer(direction: string) {
 
         if (mapMobs.some(mob => mob.x === player.x && mob.y === player.y)) {
             const mobGroup = mapMobs.find(mob => mob.x === player.x && mob.y === player.y);
-            combat(player, mobGroup);
+            combat(player.partyMembers, mobGroup);
         }
-    } else {        
+    } else {
         // Show an error message on the map
         const message = '{red-fg}The terrain is impassable in that direction.{/red-fg}';
         displayMap(); // Refresh the map display
