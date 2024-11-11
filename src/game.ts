@@ -1,3 +1,4 @@
+
 import blessed from 'blessed';
 import { Item, MeleeWeapon, Armor, Potion, Grenade, ItemAttributes, MeleeWeaponAttributes, ArmorAttributes, GrenadeAttributes } from './item.js';
 
@@ -11,7 +12,7 @@ import { MobGroup, Mob, GroupOfMobsPositioned } from './mobs.js';
 
 // Define a type for terrain visual configurations
 interface TerrainType {
-    visual: string;
+    visual: string; 
     description: string;
     isPassable: boolean;
 }
@@ -51,7 +52,7 @@ interface Player {
 
 // Initialize game state based on the parsed configuration
 const player: Player= {
-    partyMembers: mobsConfigmobGroups[0],
+    partyMembers: mobsConfig.mobGroups[0],
     x: playerStart.x,
     y: playerStart.y,
     inventory: []
