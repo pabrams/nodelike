@@ -98,8 +98,79 @@ function createMobgroupInstance(mobKey: string, x: number, y: number): MobGroup 
     return new GroupOfMobsPositioned(mobDetail, x, y);  
 }
 
-function combat(mobGroup1: MobGroup | GroupOfMobsPositioned, mobGroup2: MobGroup | GroupOfMobsPositioned) : void {
+function combat(mobGroup1: MobGroup, mobGroup2: GroupOfMobsPositioned) : void {
+    const combatBox = blessed.box({
+        top: config.viewPort.box.top,
+        left: config.viewPort.box.left,
+        width: config.viewPort.box.width,
+        height: config.viewPort.box.height,
+        border: {
+            type: 'line',
+        },
+        style: {
+            border: {
+                fg: '#880088',
+            },
+            focus: {
+                border: {
+                    fg: '#ff00ff',
+                },
+            },
+            bg: config.viewPort.box.bg,
+            fg: config.viewPort.box.fg,
+        },
+    });
     
+    // Create a box for the top content
+    const topBox = blessed.box({
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '50%', // Adjust as needed
+        content: mobGroup1.description,
+        tags: true,
+        style: {
+            bg: config.viewPort.box.bg,
+            fg: config.viewPort.box.fg,
+        },
+    });
+    
+    // Create a box for the bottom content
+    const bottomBox = blessed.box({
+        bottom: 0, // Position at the bottom of the parent
+        left: 0,
+        width: '100%',
+        height: '50%', // Adjust as needed
+        content: mobGroup2.description,
+        tags: true,
+        style: {
+            bg: config.viewPort.box.bg,
+            fg: config.viewPort.box.fg,
+        },
+    });
+    
+    // Append the sub-boxes to the combatBox
+    combatBox.append(topBox);
+    combatBox.append(bottomBox);
+       
+    // combatBox.setContent('{top}${mobGroup1.description}{/top}{bottom}${mobGroup2.description}{/bottom}');
+
+
+    // Append the combatBox to the screen
+    screen.append(combatBox);
+    screen.render();
+ 
+    // Update the combat panel with the current state of the game
+    // place the two mobGroups onscreen in generated starting position for each mob according to  default formations that you will need to make up as you go. 
+    // display the names and descriptions of the mob groups in the combat panel.
+    // allow the player to choose a mob group to attack and display their available actions (e.g., attack, use a potion, etc.)
+    // provide feedback to the player on their chosen action and the outcome (e.g., damage dealt, healing received, etc.)
+    // update the combat panel with the new state of the game after the player's chosen action has been performed
+    // continue the combat loop until one of the mob groups is defeated or the player runs out of health.
+    // display a congratulatory message to the player and the winner, and exit the combat loop.
+    // handle any potential errors or exceptions that may occur during the combat process and provide appropriate feedback to the player.
+    // continue the game loop until the player chooses to exit the game.
+
 }
 
 // Initialize items from map configuration with their locations
@@ -109,7 +180,7 @@ let items: Item[] = mapConfig.items
 
 let mapMobs = mapConfig.mobs
     .map(({key, x, y}) => createMobgroupInstance(key, x, y))
-    .filter((mobGroup): mobGroup is GroupOfMobsPositioned => mobGroup !== null);
+    .filter((mobGroupPositioned): mobGroupPositioned is GroupOfMobsPositioned => mobGroupPositioned !== null);
 
 const screen = blessed.screen({
     smartCSR: true
@@ -403,7 +474,7 @@ function movePlayer(direction: string) {
 
         if (mapMobs.some(mob => mob.x === player.x && mob.y === player.y)) {
             const mobGroup = mapMobs.find(mob => mob.x === player.x && mob.y === player.y);
-            combat(player.partyMembers, mobGroup);
+            mobGroup && combat(player.partyMembers, mobGroup);
         }
     } else {
         // Show an error message on the map
