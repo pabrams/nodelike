@@ -10,6 +10,8 @@ import terrainConfig from '../config/terrainTypes.json' assert {type: 'json'};
 
 import { MobGroup, Mob, GroupOfMobsPositioned } from './mobs.js';
 
+import {keyMappings} from './controls.js'
+
 // Define a type for terrain visual configurations
 interface TerrainType {
     visual: string; 
@@ -379,17 +381,29 @@ function pickUpItem() {
 }
 
 function setupInput() {
-    screen.key(['escape', 'q', 'C-c'], () => {
+    screen.key(['C-c'], () => {
         process.exit(0);
     });
 
     screen.key('h', () => displayHelp());
     screen.key('i', () => displayInventory());
     screen.key('p', () => pickUpItem());
-    screen.key(['w', 'a', 's', 'd'], (ch, key) => {
-        movePlayer(key.name);
-        displayMap(); // Draw the map after moving
-    });
+    console.error(keyMappings);
+    screen.key(
+        [
+            keyMappings.west[0], 
+            keyMappings.south[0], 
+            keyMappings.east[0], 
+            keyMappings.north[0],
+            keyMappings.ne[0],
+            keyMappings.nw[0],
+            keyMappings.sw[0],
+            keyMappings.se[0]
+        ], (ch, key) => {
+            movePlayer(key.name);
+            displayMap(); // Draw the map after moving
+        }
+    );
 }
 
 function displayHelp() {
@@ -457,14 +471,28 @@ function movePlayer(direction: string) {
     let newX = player.x;
     let newY = player.y;
 
-    if (direction === 'w' && player.y > 0) {
+    if (direction === keyMappings.north[0] && player.y > 0) {
         newY--;
-    } else if (direction === 'a' && player.x > 0) {
+    } else if (direction === keyMappings.west[0] && player.x > 0) {
         newX--;
-    } else if (direction === 's' && player.y < mapHeight - 1) {
+    } else if (direction === keyMappings.south[0] && player.y < mapHeight - 1) {
         newY++;
-    } else if (direction === 'd' && player.x < mapWidth - 1) {
+    } else if (direction === keyMappings.east[0]  && player.x < mapWidth - 1) {
         newX++;
+    }    
+    else if (direction === keyMappings.ne[0] && player.y > 0 && player.x < mapWidth - 1 ) {
+        newY--;
+        newX++
+    } else if (direction === keyMappings.nw[0] && player.y > 0 && player.x > 0) {
+        newY--;
+        newX--;
+    } else if (direction === keyMappings.se[0] && player.y < mapHeight - 1 && player.x < mapWidth - 1) {
+        newY++;
+        newX++;
+    } else if (direction === keyMappings.sw[0]  && player.y < mapHeight - 1 && player.x > 0) {
+        newY++;
+        newX--;
+
     }
 
     // Check if the new position is passable
