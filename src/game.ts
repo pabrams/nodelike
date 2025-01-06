@@ -10,7 +10,7 @@ import terrainConfig from '../config/terrainTypes.json' assert {type: 'json'};
 
 import { MobGroup, Mob, GroupOfMobsPositioned } from './mobs.js';
 
-import {keyMappings} from './controls.js'
+import {keyMappings as input} from './controls.js'
 
 // Define a type for terrain visual configurations
 interface TerrainType {
@@ -381,24 +381,24 @@ function pickUpItem() {
 }
 
 function setupInput() {
-    screen.key(['C-c'], () => {
+    screen.key([input.quit], () => {
         process.exit(0);
     });
 
-    screen.key('h', () => displayHelp());
-    screen.key('i', () => displayInventory());
-    screen.key('p', () => pickUpItem());
-    console.error(keyMappings);
+    screen.key(input.displayHelp, () => displayHelp());
+    screen.key(input.displayInventory, () => displayInventory());
+    screen.key(input.pickupItem, () => pickUpItem());
+    console.error(input);
     screen.key(
         [
-            keyMappings.west[0], 
-            keyMappings.south[0], 
-            keyMappings.east[0], 
-            keyMappings.north[0],
-            keyMappings.ne[0],
-            keyMappings.nw[0],
-            keyMappings.sw[0],
-            keyMappings.se[0]
+            input.west, 
+            input.south, 
+            input.east, 
+            input.north,
+            input.ne,
+            input.nw,
+            input.sw,
+            input.se
         ], (ch, key) => {
             movePlayer(key.name);
             displayMap(); // Draw the map after moving
@@ -471,25 +471,25 @@ function movePlayer(direction: string) {
     let newX = player.x;
     let newY = player.y;
 
-    if (direction === keyMappings.north[0] && player.y > 0) {
+    if (direction === input.north && player.y > 0) {
         newY--;
-    } else if (direction === keyMappings.west[0] && player.x > 0) {
+    } else if (direction === input.west && player.x > 0) {
         newX--;
-    } else if (direction === keyMappings.south[0] && player.y < mapHeight - 1) {
+    } else if (direction === input.south && player.y < mapHeight - 1) {
         newY++;
-    } else if (direction === keyMappings.east[0]  && player.x < mapWidth - 1) {
+    } else if (direction === input.east  && player.x < mapWidth - 1) {
         newX++;
     }    
-    else if (direction === keyMappings.ne[0] && player.y > 0 && player.x < mapWidth - 1 ) {
+    else if (direction === input.ne && player.y > 0 && player.x < mapWidth - 1 ) {
         newY--;
         newX++
-    } else if (direction === keyMappings.nw[0] && player.y > 0 && player.x > 0) {
+    } else if (direction === input.nw && player.y > 0 && player.x > 0) {
         newY--;
         newX--;
-    } else if (direction === keyMappings.se[0] && player.y < mapHeight - 1 && player.x < mapWidth - 1) {
+    } else if (direction === input.se && player.y < mapHeight - 1 && player.x < mapWidth - 1) {
         newY++;
         newX++;
-    } else if (direction === keyMappings.sw[0]  && player.y < mapHeight - 1 && player.x > 0) {
+    } else if (direction === input.sw  && player.y < mapHeight - 1 && player.x > 0) {
         newY++;
         newX--;
 
