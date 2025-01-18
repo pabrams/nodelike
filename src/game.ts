@@ -104,8 +104,8 @@ function combat(mobGroup1: MobGroup, mobGroup2: GroupOfMobsPositioned) : void {
     const combatBox = blessed.box({
         top: config.viewPort.box.top,
         left: config.viewPort.box.left,
-        width: config.viewPort.box.width,
-        height: config.viewPort.box.height,
+        width: config.viewPort.map.width,
+        height: config.viewPort.map.height,
         border: {
             type: 'line',
         },
@@ -192,8 +192,8 @@ const screen = blessed.screen({
 const mapPanel = blessed.box({
     top: config.viewPort.box.top,            
     left: config.viewPort.box.left,          
-    width: config.viewPort.box.width,      
-    height: config.viewPort.box.height,     
+    width: config.viewPort.map.width + 2,      
+    height: config.viewPort.map.height + 2,     
     content: '',
     tags: true,
     border: {

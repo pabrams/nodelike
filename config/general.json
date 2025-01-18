@@ -13,14 +13,12 @@
     },
     "viewPort": {
         "map": {
-            "width":  72,
-            "height": 22
+            "width":  20,
+            "height": 12
         },
         "box": {
             "top": 0,
             "left": 0,
-            "width": 74, 
-            "height": 24,
             "bg": "black",
             "fg": "magenta",
             "border": {
