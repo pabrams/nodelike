@@ -1,33 +1,45 @@
 {
     ".": {
         "fg": "green",
+        "article": "on",
         "description": "grass",
         "isPassable": true
     },
     ":": {
         "fg": "grey",
+        "article": "on",
         "description": "gravel",
         "isPassable": true
     },
     "#": {
         "fg": "grey",
         "bg": "white", 
+        "article": "by a",
         "description": "wall",
         "isPassable": false
     },
     "!": {
         "fg": "grey",
+        "article": "near a",
         "description": "dead tree",
         "isPassable": true
     },
     "%": {
         "fg": "green",
+        "article": "near an",
         "description": "apple tree",
         "isPassable": true
     },
     " ": {
         "fg": "white",
+        "article": "on",
         "description": "dirt",
+        "isPassable": true
+    },
+    "*": {
+        "fg": "yellow",
+        "article": "at an",
+        "description": "entrance to a base",
         "isPassable": true
     }
 }

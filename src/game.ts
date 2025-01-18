@@ -15,6 +15,7 @@ import {keyMappings as input} from './controls.js'
 // Define a type for terrain visual configurations
 interface TerrainType {
     visual: string; 
+    article: string;
     description: string;
     isPassable: boolean;
 }
@@ -24,6 +25,7 @@ const terrainTypes: Record<string, TerrainType> = Object.fromEntries(
         key,
         {
             visual: `{${value.fg}-fg}${key}{/${value.fg}-fg}`,
+            article: `${value.article}`,
             description: `{${value.fg}-fg}${value.description}{/${value.fg}-fg}`,
             isPassable: value.isPassable,
         }
@@ -348,7 +350,9 @@ function showInfo(extraInfo: string){
 
 
 function showTerrainUnderPlayer() {
-    const infoText = `{cyan-fg}You are standing on {/cyan-fg}${terrainTypes[mapConfig.terrain[player.y][player.x]].description}`;
+
+    const terrainType = terrainTypes[mapConfig.terrain[player.y][player.x]];
+    const infoText = `{cyan-fg}You are standing ${terrainType.article} {/cyan-fg}${terrainType.description}`;
     return infoText;
 }
 // Check if the player is on an item and display a message
