@@ -536,7 +536,7 @@ function movePlayer(direction: string) {
         message = `You move ${directionToString(direction)}`;
     } else {
         // Set a message for the player
-        message = '{red-fg}The terrain is impassable in that direction.{/red-fg}';
+        message = `{red-fg}The terrain is impassable to the{/red-fg} ${directionToString(direction)}.`;
 
     }
     
