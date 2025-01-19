@@ -14,9 +14,9 @@ import {keyMappings as input} from './controls.js'
 
 // Define a type for terrain visual configurations
 interface TerrainType {
-    visual: string; 
-    article: string;
-    description: string;
+    coloredVisual: string; 
+    sameSquareInteraction: string;
+    coloredDescription: string;
     isPassable: boolean;
 }
 
@@ -24,9 +24,9 @@ const terrainTypes: Record<string, TerrainType> = Object.fromEntries(
     Object.entries(terrainConfig).map(([key, value]) => [
         key,
         {
-            visual: `{${value.fg}-fg}${key}{/${value.fg}-fg}`,
-            article: `${value.article}`,
-            description: `{${value.fg}-fg}${value.description}{/${value.fg}-fg}`,
+            coloredVisual: `{${value.fg}-fg}{${value.bg}-bg}${key}{/${value.fg}-fg}{/${value.bg}-bg}`,
+            sameSquareInteraction: `${value.sameSquareInteraction}`,
+            coloredDescription: `{${value.fg}-fg}{${value.bg}-bg}${value.description}{/${value.fg}-fg}{/${value.bg}-bg}`,
             isPassable: value.isPassable,
         }
     ])
@@ -316,8 +316,8 @@ function drawMap() {
                 row.push(config.chars.item);
             } else {
                 const terrainType = terrain[y][x];
-                if (terrainType && terrainTypes[terrainType].visual) {
-                    row.push(terrainTypes[terrainType].visual); // Terrain representation
+                if (terrainType && terrainTypes[terrainType].coloredVisual) {
+                    row.push(terrainTypes[terrainType].coloredVisual); // Terrain representation
                 }
             }
         }
@@ -352,7 +352,7 @@ function showInfo(extraInfo: string){
 function showTerrainUnderPlayer() {
 
     const terrainType = terrainTypes[mapConfig.terrain[player.y][player.x]];
-    const infoText = `{cyan-fg}You are standing ${terrainType.article} {/cyan-fg}${terrainType.description}`;
+    const infoText = `You are ${terrainType.sameSquareInteraction} ${terrainType.coloredDescription}`;
     return infoText;
 }
 // Check if the player is on an item and display a message

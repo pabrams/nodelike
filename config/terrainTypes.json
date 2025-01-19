@@ -1,45 +1,79 @@
 {
     ".": {
         "fg": "green",
-        "article": "on",
+        "bg": "black", 
+        "sameSquareInteraction": "standing on",
         "description": "grass",
+        "isPassable": true
+    },
+    "~": {
+        "fg": "blue",
+        "bg": "black", 
+        "sameSquareInteraction": "wading in",
+        "description": "shallow water",
+        "isPassable": true
+    },
+    "@": {
+        "fg": "blue",
+        "bg": "black", 
+        "sameSquareInteraction": "swimming in",
+        "description": "water",
         "isPassable": true
     },
     ":": {
         "fg": "grey",
-        "article": "on",
+        "bg": "black", 
+        "sameSquareInteraction": "standing on",
         "description": "gravel",
         "isPassable": true
     },
     "#": {
-        "fg": "grey",
-        "bg": "white", 
-        "article": "by a",
+        "fg": "#888888",
+        "bg": "black", 
+        "sameSquareInteraction": "embedded inside a",
         "description": "wall",
+        "isPassable": false
+    },   
+    "^": {
+        "fg": "white", 
+        "bg": "black", 
+        "sameSquareInteraction": "embedded inside a",
+        "description": "mountain",
         "isPassable": false
     },
     "!": {
-        "fg": "grey",
-        "article": "near a",
         "description": "dead tree",
+        "sameSquareInteraction": "standing near a",
+        "fg": "#888888",
+        "bg": "black", 
         "isPassable": true
     },
     "%": {
-        "fg": "green",
-        "article": "near an",
         "description": "apple tree",
+        "sameSquareInteraction": "standing near an",
+        "fg": "#008800",
+        "bg": "black", 
         "isPassable": true
     },
     " ": {
-        "fg": "white",
-        "article": "on",
         "description": "dirt",
+        "sameSquareInteraction": "standing on",
+        "fg": "#888800",
+        "bg": "black", 
         "isPassable": true
     },
-    "*": {
+    "-": {
+        "description": "dirt",
+        "sameSquareInteraction": "standing on",
+        "fg": "#888800",
+        "bg": "black", 
+        "isPassable": true
+    },
+    "0": {
         "fg": "yellow",
-        "article": "at an",
+        "bg": "black", 
         "description": "entrance to a base",
+        "sameSquareInteraction": "standing at an",
         "isPassable": true
     }
 }
