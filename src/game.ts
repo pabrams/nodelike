@@ -341,16 +341,14 @@ function startGame() {
 function showInfo(extraInfo: string){
     
     const infoText = 
+        extraInfo +  '\n' + 
         showTerrainUnderPlayer() + '\n' + 
-        checkForItemUnderPlayer() + '\n' + 
-        extraInfo;
-    
+        checkForItemUnderPlayer() + '\n';
     renderInfo(infoText);
 }
 
 
 function showTerrainUnderPlayer() {
-
     const terrainType = terrainTypes[mapConfig.terrain[player.y][player.x]];
     const infoText = `You are ${terrainType.sameSquareInteraction} ${terrainType.coloredDescription}`;
     return infoText;
@@ -470,6 +468,32 @@ function isPassable(x: number, y: number) {
     return terrainTypes[terrainType].isPassable;
 }
 
+function directionToString(direction: string){
+    if (direction === input.north){
+        return "north";
+    } else if (direction === input.west) {
+        return "west";
+    } else if (direction === input.south) {
+        return "south";
+    } else if (direction === input.east) {
+        return "east"
+    }    
+    else if (direction === input.ne) {
+        return "northeast";
+    } else if (direction === input.nw) {
+        return "northwest";
+    } else if (direction === input.se) {
+        return "southeast";
+    } else if (direction === input.sw) {
+        return "southwest";
+    } else if (direction === input.down) {
+        return "down";
+    } else if (direction === input.up) {
+        return "up";
+    } 
+    
+}
+
 // Movement logic for player
 function movePlayer(direction: string) {
     let newX = player.x;
@@ -498,6 +522,7 @@ function movePlayer(direction: string) {
         newX--;
 
     }
+    let message = "";
 
     // Check if the new position is passable
     if (isPassable(newX, newY)) {
@@ -508,14 +533,15 @@ function movePlayer(direction: string) {
             const mobGroup = mapMobs.find(mob => mob.x === player.x && mob.y === player.y);
             mobGroup && combat(player.partyMembers, mobGroup);
         }
+        message = `You move ${directionToString(direction)}`;
     } else {
-        // Show an error message on the map
-        const message = '{red-fg}The terrain is impassable in that direction.{/red-fg}';
-        displayMap(); // Refresh the map display
-        renderMap(message);
+        // Set a message for the player
+        message = '{red-fg}The terrain is impassable in that direction.{/red-fg}';
+
     }
+    
     displayMap();
-    showInfo("");
+    showInfo(message);
 }
 
 
