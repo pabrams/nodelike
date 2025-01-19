@@ -63,7 +63,7 @@
         "isPassable": true
     },
     "-": {
-        "description": "dirt",
+        "description": "sand",
         "sameSquareInteraction": "standing on",
         "fg": "#888800",
         "bg": "black", 
