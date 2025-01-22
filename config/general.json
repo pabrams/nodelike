@@ -27,16 +27,16 @@
         }
     },
     "infoPanel": {
-        "top": 24,
+        "top": 14,
         "left": 0,
-        "width": 74,
+        "width": 60,
         "height": 10
     },
-    "debug": false,
+    "debug": true,
     "debugPanel": {
         "top": 0,
-        "left": 74,
-        "width": 40,
-        "height": 32
+        "left": 60,
+        "width": 30,
+        "height": 24
     }
 }

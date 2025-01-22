@@ -16,4 +16,5 @@ export const keyMappings = {
     down: '>',
     up: '<',
     wait: 's',
+    toggleLook: 'l',
 };

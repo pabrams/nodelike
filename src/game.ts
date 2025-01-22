@@ -11,6 +11,7 @@ import terrainConfig from '../config/terrainTypes.json' assert {type: 'json'};
 import { MobGroup, Mob, GroupOfMobsPositioned } from './mobs.js';
 
 import {keyMappings as input} from './controls.js'
+import { debug } from 'console';
 
 // Define a type for terrain visual configurations
 interface TerrainType {
@@ -51,6 +52,8 @@ interface Player {
     partyMembers: MobGroup;
     x: number;
     y: number;
+    lookOffset_x: number;
+    lookOffset_y: number;
     inventory: Item[]; // Ensure inventory is defined as an array of Item
 }
 
@@ -59,9 +62,12 @@ const player: Player= {
     partyMembers: mobsConfig.mobGroups[0],
     x: playerStart.x,
     y: playerStart.y,
+    lookOffset_x: 0,
+    lookOffset_y: 0,
     inventory: []
 };
 
+let lookMode: boolean = false;
 // Define a type for the complete item config
 type ItemConfig = {
     [key: string]: ItemAttributes | MeleeWeaponAttributes | ArmorAttributes | GrenadeAttributes;
@@ -299,27 +305,43 @@ function drawMap() {
         debugContent.push(`startX (Math.max(0, ${player.x - halfX})): {|} ${startX}`);
         debugContent.push(`endX (Math.min(mapWidth, startX + viewportWidth)): {|} ${endX}`);
         debugContent.push(`endX (Math.min(${mapWidth}, ${startX + viewportWidth})): {|} ${endX}`);
+        debugContent.push(` `);
+        debugContent.push(` `);
+        debugContent.push(`player.lookOffset_x, player.lookOffset_y: ${player.lookOffset_x}, ${player.lookOffset_y}`);
         
         debugPanel.setContent(debugContent.join('\n'));
         screen.render();
     }
 
     for (let y = startY; y < endY; y++) {
-        const row = [];
+        let row: string[] = [];
         for (let x = startX; x < endX; x++) {
+            let mapTile = "";
             if (x === player.x && y === player.y) {
-                row.push(config.chars.player); // Player position
+                mapTile = config.chars.player;
             } else if (mapMobs.some((mobGroup) => mobGroup.x === x && mobGroup.y === y)) {
-                row.push(config.chars.mob);
+                mapTile = config.chars.mob;
             }
             else if (items.some(item => item.attributes?.x === x && item.attributes?.y === y)) {
-                row.push(config.chars.item);
+                mapTile = config.chars.item;
             } else {
                 const terrainType = terrain[y][x];
                 if (terrainType && terrainTypes[terrainType].coloredVisual) {
-                    row.push(terrainTypes[terrainType].coloredVisual); // Terrain representation
+                    mapTile = terrainTypes[terrainType].coloredVisual; // Terrain representation
+                }
+            }         
+
+            // if looking, paint background red
+            if (lookMode){
+                const lookingAt_x = player.x + player.lookOffset_x;
+                const lookingAt_y = player.y + player.lookOffset_y;
+                if (x === lookingAt_x && y === lookingAt_y) {
+                    // mapTile = `{red-bg}${mapTile}{/red-bg}`;
+                    mapTile = `{red-bg}{white-fg}o{/white-fg}{/red-bg}`;
+                    // console.log("wtf");
                 }
             }
+            row.push(mapTile);
         }
         map.push(row.join(''));
     }
@@ -347,20 +369,41 @@ function showInfo(extraInfo: string){
     renderInfo(infoText);
 }
 
-
 function showTerrainUnderPlayer() {
-    const terrainType = terrainTypes[mapConfig.terrain[player.y][player.x]];
-    const infoText = `You are ${terrainType.sameSquareInteraction} ${terrainType.coloredDescription}`;
+    let terrainType;
+    let infoText;
+    if (lookMode){
+        terrainType = terrainTypes[mapConfig.terrain[player.y + player.lookOffset_y][player.x + player.lookOffset_x]];
+        infoText = `You see ${terrainType.coloredDescription}`;
+    }else{
+        terrainType = terrainTypes[mapConfig.terrain[player.y][player.x]];
+        infoText = `You are ${terrainType.sameSquareInteraction} ${terrainType.coloredDescription}`;
+    }
     return infoText;
 }
 // Check if the player is on an item and display a message
 function checkForItemUnderPlayer() {
-    const item = items.find(item => item?.attributes.x === player.x && item.attributes.y === player.y);
+    let item;
+    if (lookMode){
+        item = items.find(item => item?.attributes.x  === player.x + player.lookOffset_x && item.attributes.y === player.y + player.lookOffset_y);
+    }
+    else {
+        item = items.find(item => item?.attributes.x === player.x && item.attributes.y === player.y);
+    }
     let itemText = '';
     if (item) {
         itemText += `You see a ${item.attributes.name} here: ${item.attributes.description}`;
     }
     return itemText
+}
+
+function toggleLook() {
+    if (lookMode) {
+        lookMode = false;
+        player.lookOffset_x = 0;
+        player.lookOffset_y = 0;
+    }
+    else {lookMode = true;}
 }
 
 // Explicitly pick up an item when the player presses "P"
@@ -390,6 +433,7 @@ function setupInput() {
     screen.key(input.displayHelp, () => displayHelp());
     screen.key(input.displayInventory, () => displayInventory());
     screen.key(input.pickupItem, () => pickUpItem());
+    screen.key(input.toggleLook, () => toggleLook());
     console.error(input);
     screen.key(
         [
@@ -402,7 +446,12 @@ function setupInput() {
             input.sw,
             input.se
         ], (ch, key) => {
-            movePlayer(key.name);
+            if (!lookMode) {
+                movePlayer(key.name);
+            }
+            else {
+                moveLook(key.name)
+            }
             displayMap(); // Draw the map after moving
         }
     );
@@ -418,10 +467,12 @@ function displayHelp() {
         `{${headingFg}}Help Screen{/${headingFg}}`,
         `{${textFg}}Use the following keys to control the game:`,
         `{${commandFg}}WASD{/${commandFg}}${colon}Move up, left, down, right.`,
+        `{${commandFg}}L   {/${commandFg}}${colon}Toggle 'look' mode.{/${textFg}}`,
         `{${commandFg}}I   {/${commandFg}}${colon}View inventory.`,
         `{${commandFg}}P   {/${commandFg}}${colon}Pick up items.`,
         `{${commandFg}}H   {/${commandFg}}${colon}Show this help screen.`,
         `{${commandFg}}Q   {/${commandFg}}${colon}Quit the game.{/${textFg}}`,
+        
     ].join('\n');
     showPopupBox(helpText);
 }
@@ -490,8 +541,47 @@ function directionToString(direction: string){
         return "down";
     } else if (direction === input.up) {
         return "up";
-    } 
+    }
+}
+
+function moveLook(direction: string) {
+    const lookingAt_x = player.lookOffset_x + player.x;
+    const lookingAt_y = player.lookOffset_y + player.y;
     
+    if (direction === input.north && lookingAt_y > player.y - viewportHeight/2 + 1) {
+        player.lookOffset_y -= 1;
+    } else if (direction === input.west && lookingAt_x > player.x - viewportWidth/2) {
+        player.lookOffset_x -= 1;
+    } else if (direction === input.south && lookingAt_y < player.y + viewportHeight/2- 1) {
+        player.lookOffset_y += 1;
+    } else if (direction === input.east  && lookingAt_x < player.x + viewportWidth/2 - 1) {
+         player.lookOffset_x += 1;
+    }    
+    else if (direction === input.ne && lookingAt_y > player.y - viewportHeight/2 + 1 && lookingAt_x < player.x + viewportWidth/2- 1 ) {
+        player.lookOffset_y -= 1;
+        player.lookOffset_x += 1;
+    } else if (direction === input.nw && lookingAt_y > player.y - viewportHeight/2 + 1 && lookingAt_x > player.x - viewportWidth/2 + 1) {
+        player.lookOffset_y -= 1;
+        player.lookOffset_x -= 1;
+    } else if (direction === input.se && lookingAt_y < player.y - viewportHeight /2 - 1 && lookingAt_x < player.x + viewportWidth/2 - 1) {
+        player.lookOffset_y += 1;
+        player.lookOffset_x += 1;
+    } else if (direction === input.sw  && lookingAt_y < player.y - viewportHeight /2 - 1 && lookingAt_x > player.x - viewportWidth/2 + 1) {
+        player.lookOffset_y += 1;
+        player.lookOffset_x -= 1;
+    }
+
+     let focus_x = player.x + player.lookOffset_x;
+     let focus_y = player.y + player.lookOffset_y;
+     if (focus_x < 0) {
+        player.lookOffset_x = 0 - player.x;
+     }
+     if (focus_y < 0) {
+        player.lookOffset_y = 0 - player.y;
+     }
+    const message = `You move your attention to the ${directionToString(direction)}`;
+    displayMap();
+    showInfo(message);
 }
 
 // Movement logic for player
