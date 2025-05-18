@@ -2,11 +2,11 @@
 import blessed from 'blessed';
 import { Item, MeleeWeapon, Armor, Potion, Grenade, ItemAttributes, MeleeWeaponAttributes, ArmorAttributes, GrenadeAttributes } from './item.js';
 
-import config from '../config/general.json' assert {type: 'json'};
-import mapj from '../config/map.json' assert {type: 'json'};
-import itemConfigJson from '../config/items.json' assert { type: 'json' };
-import mobsConfig from '../config/mobs.json' assert { type: 'json'}
-import terrainConfig from '../config/terrainTypes.json' assert {type: 'json'};
+import config from './general.json' assert {type: 'json'};
+import mapj from './map.json' assert {type: 'json'};
+import itemConfigJson from './items.json' assert { type: 'json' };
+import mobsConfig from './mobs.json' assert { type: 'json'}
+import terrainConfig from './terrainTypes.json' assert {type: 'json'};
 
 import { MobGroup, Mob, GroupOfMobsPositioned } from './mobs.js';
 
